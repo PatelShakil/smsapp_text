@@ -1,0 +1,615 @@
+@Composable
+fun AdminDashboardProfileHeader(localData: LocalData){
+    val spacing = MaterialTheme.spacing
+    val paddingModifier  = Modifier.padding(10.dp)
+    Card(elevation = 22.dp,modifier = Modifier
+        .wrapContentHeight()
+        .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+    )
+    {
+        Column(
+            modifier = Modifier.padding(spacing.medium)
+            //.border(1.dp, colorScheme.primary)
+        ){
+            Row(modifier= Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center){
+                Image(
+                    painter = painterResource(R.drawable.ic_account_circle_dashboard),
+                    contentDescription = stringResource(id = R.string.empty)
+                    //modifier = Modifier.align(Align.CenterVertically)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.padding(bottom = spacing.small)
+            ) {
+                Text(
+                    //text = context.toDateString(invoice.createdAt),
+                    text="Welcome!! ${localData.username}",
+                    style = MaterialTheme.typography.displayMedium,
+                    modifier = Modifier.weight(0.9f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 19.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+
+                    )
+            }
+
+            Row{
+                Text(
+                    text = "${localData.schoolname}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+
+            Row {
+                Text(
+                    text = "${localData.shift} (${localData.session})",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+
+            }
+
+            Row {
+                Text(
+                    text = "( Admin )",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                )
+
+            }
+            /*Row {
+                Divider(color =androidx.compose.material3.MaterialTheme.colorScheme.primary , thickness = 1.dp)
+            }
+
+             */
+
+            /*
+            Row(modifier = Modifier
+                .padding(top = 5.dp)
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center)
+            {
+                Button(
+                    onClick = {
+                        //viewModel.login(userid.trim(), password.trim())
+
+                    },
+                ) {
+                    androidx.compose.material3.Text(
+                        text = stringResource(id = R.string.viewprofile),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+            }
+            */
+
+        }
+    }
+}
+
+@Composable
+fun AdminDashboardTodaysActivity(navController: NavController){
+    val spacing = MaterialTheme.spacing
+    val paddingModifier  = Modifier.padding(10.dp)
+    Card(elevation = 22.dp,modifier = Modifier
+        .wrapContentHeight()
+        .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+    )
+    {
+        Column(
+            modifier = Modifier.padding(spacing.medium)
+            //.border(1.dp, colorScheme.primary)
+        ){
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Image(
+                    painter = painterResource(R.drawable.ic_view_activity),
+                    contentDescription = stringResource(id = R.string.empty),
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(AdminAppScreen.TodayHiglight.Home.route)
+                        }
+                )
+                Text(
+                    text = "View Today's Activity",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                        .padding(top = 2.dp)
+                        .padding(start = 4.dp)
+                        .clickable {
+                            navController.navigate(AdminAppScreen.TodayHiglight.Home.route)
+                        },
+                    //textAlign = TextAlign.Start,
+
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                    //fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminDashboardQuickNavigation1(navController: NavController) {
+    val spacing = MaterialTheme.spacing
+    Card(
+        elevation = 30.dp, modifier = Modifier
+            .wrapContentHeight()
+            .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+    )
+    {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+        ){
+            Image(
+                painter = painterResource(R.drawable.ic_sms_template_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.SMSTemplate.Template.route)
+                    }
+            )
+            Column(modifier = Modifier
+                .padding(top = 75.dp)
+                .padding(start = 24.dp)
+                .align(Alignment.TopStart)
+            ) {
+                Text(text = "SMS Template")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_sms_report_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.SMSReport.Report.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "SMS Report")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_message_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.SendSMS.SendSMS.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 30.dp)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "Send SMS")
+            }
+
+            //End Menu
+            Image(
+                painter = painterResource(R.drawable.ic_rupee_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 40.dp)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.StudentFeeProfile.Collect.route)
+                    }
+
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 35.dp)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text = "Collect Fee")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_preview_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.FeePreview.Home.route)
+                    }
+            )
+            Column(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text = "Fee Preview")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_fee_report_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 40.dp)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.FeeReport.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 30.dp)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text = "Fee Report")
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminDashboardStudentNavigation(navController: NavController) {
+    val spacing = MaterialTheme.spacing
+    Card(
+        elevation = 30.dp, modifier = Modifier
+            .wrapContentHeight()
+            .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+    )
+    {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+        ){
+            Image(
+                painter = painterResource(R.drawable.ic_person_search_blue_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.StudentsSearch.Home.route)
+                    }
+
+
+            )
+            Column(modifier = Modifier
+                .padding(top = 75.dp)
+                .padding(start = 18.dp)
+                .align(Alignment.TopStart)
+            ) {
+                Text(text = "Student Search")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_people_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.StudentsDetails.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "Students")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_newadmission_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.Students.EnrollNew.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 30.dp)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "Enrollment")
+            }
+
+            //End Menu
+
+        }
+    }
+}
+
+@Composable
+fun AdminDashboardSettingsNavigation(navController: NavController,isformSettings: Boolean= false) {
+    val spacing = MaterialTheme.spacing
+    Card(
+        elevation = 30.dp, modifier = Modifier
+            .wrapContentHeight()
+            .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+    )
+    {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(320.dp)
+        ){
+            Image(
+                painter = painterResource(R.drawable.ic_info),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.SchoolInfo.Home.route)
+                    }
+
+
+            )
+            Column(modifier = Modifier
+                .padding(top = 75.dp)
+                .padding(start = 33.dp)
+                .align(Alignment.TopStart)
+            ) {
+                Text(text = "School Info")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_settings),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.AdmissionSetting.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "Admission")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_classes),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 40.dp)
+                    .padding(top = 10.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.ClassSettings.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 30.dp)
+                .padding(top = 75.dp)
+            ) {
+                Text(text = "Classroom")
+            }
+
+            //Center Menu
+
+            Image(
+                painter = painterResource(R.drawable.ic_chair_blue),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 40.dp)
+                    //.padding(top = 5.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.CapacityInfo.Capacity.route)
+                    }
+
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 25.dp)
+                .padding(top = 70.dp)
+            ) {
+                Text(text = "Class Capacity")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_settings_fee_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    //.padding(top = 110.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.FeeSetting.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.Center)
+                .padding(top = 70.dp)
+            ) {
+                Text(text = "Fee Settings")
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_fee_header_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 40.dp)
+                    //.padding(top = 110.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.FeeCategory.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 30.dp)
+                .padding(top = 70.dp)
+            ) {
+                Text(text = "Fee Header")
+            }
+
+
+
+            //End Menu
+            Image(
+                painter = painterResource(R.drawable.ic_sticky_note_2_blue_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 40.dp)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable {
+                        navController.navigate(AdminAppScreen.FeeStructure.Home.route)
+                    }
+            )
+
+            Column(modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 26.dp)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text = "Fee Structure")
+            }
+
+
+            Image(
+                painter = painterResource(if(isformSettings)R.drawable.ic_preview_50 else R.drawable.ic_data_exploration_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable{
+                        if(isformSettings) navController.navigate(AdminAppScreen.FeePreview.Home.route) else navController.navigate(AdminAppScreen.NoticeInfo.Home.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text = if(isformSettings)"Fee Preview" else "Notice Info")
+            }
+            Image(
+                painter = painterResource(if(isformSettings)R.drawable.ic_sms_template_blue else R.drawable.ic_notification_add_50),
+                contentDescription = stringResource(id = R.string.empty),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 40.dp)
+                    .padding(bottom = 20.dp)
+                    .height(80.dp)
+                    .clickable {
+                        if(isformSettings) navController.navigate(AdminAppScreen.SMSTemplate.Template.route) else navController.navigate(AdminAppScreen.Notice.Create.route)
+                    }
+
+            )
+            Column(modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp)
+                .padding(bottom = 15.dp)
+            ) {
+                Text(text =if(isformSettings)"SMS Template" else "Create Notice")
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminDashboardContactBar(navController: NavController){
+    val spacing = MaterialTheme.spacing
+    val paddingModifier  = Modifier.padding(10.dp)
+    Card(elevation = 28.dp,modifier = Modifier
+        .wrapContentHeight()
+        .padding(
+            start = spacing.medium,
+            end = spacing.medium,
+            top = spacing.medium,
+            bottom = spacing.medium
+        )
+        //.border(0.5.dp, Color.Gray, RoundedCornerShape(5.dp))
+    )
+    {
+        Column(
+            modifier = Modifier.padding(spacing.medium),
+            horizontalAlignment = Alignment.CenterHorizontally
+            //.border(1.dp, colorScheme.primary)
+        ){
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.padding(bottom = spacing.small)
+            ) {
+                Text(
+                    //text = context.toDateString(invoice.createdAt),
+                    text="Get in touch with us",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(0.9f),
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Box(modifier = Modifier
+                .padding(top = 6.dp)
+                .background(MainColor, CircleShape),) {
+                Text(
+                    text = stringResource(id = R.string.contact_us),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .clickable {
+                            navController.navigate(AdminAppScreen.ContactUs.Home.route)
+                        },
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}

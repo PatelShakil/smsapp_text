@@ -1,0 +1,192 @@
+//import statements
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import coil.imageLoader
+import coil.memory.MemoryCache
+import coil.request.ImageRequest
+import com.mycampus.smsapp.ui.theme.AppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.io.File
+import kotlin.math.sqrt
+
+//method to open pdffile
+//pass the bytearray to CreatePdfFile() function
+
+@Composable
+fun CreatePdfFile(byteArray: ByteArray) {
+    val permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    val grantResults = permissions.map {
+        ContextCompat.checkSelfPermission(LocalContext.current, it)
+    }.toIntArray()
+
+    if (grantResults.contains(PackageManager.PERMISSION_DENIED)) {
+        ActivityCompat.requestPermissions(LocalContext.current as Activity, permissions, 1)
+
+    }
+
+    if(grantResults.contains(PackageManager.PERMISSION_GRANTED)){
+        // Create a new File object.
+        val pdfDirectory = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "/myCampus/"
+        )
+        if (!pdfDirectory.exists()){
+            pdfDirectory.mkdirs()
+        }
+        val file = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "myCampus/abcd.pdf"
+        )
+        if (!file.exists()){
+            file.createNewFile()
+        }
+
+        // Create a new FileOutputStream object for the file.
+        val fileOutputStream = FileOutputStream(file)
+
+        // Write the byte array to the file.
+        fileOutputStream.write(byteArray)
+
+        // Close the fileOutputStream object.
+        fileOutputStream.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = LocalContext.current.contentResolver
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/myCampus/")
+            }
+            resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+        }
+        // Open the PDF file in the user device.
+        PdfViewer(file = file)
+
+
+//        val context = LocalContext.current
+//        LaunchedEffect(key1 = ""){
+//            val intent = Intent(
+//                Intent.ACTION_VIEW, FileProvider.getUriForFile(
+//                    context,
+//                    context.packageName + ".fileprovider",
+//                    file
+//                )
+//            )
+//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            context.startActivity(intent)
+//        }
+
+    }
+}
+@Composable
+fun PdfViewer(
+    modifier: Modifier = Modifier,
+    file : File,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp)
+) {
+    val rendererScope = rememberCoroutineScope()
+    val mutex = remember { Mutex() }
+    val renderer by produceState<PdfRenderer?>(null, file.toURI()) {
+        rendererScope.launch(Dispatchers.IO) {
+            val input = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            value = PdfRenderer(input)
+        }
+        awaitDispose {
+            val currentRenderer = value
+            rendererScope.launch(Dispatchers.IO) {
+                mutex.withLock {
+                    currentRenderer?.close()
+                }
+            }
+        }
+    }
+    val context = LocalContext.current
+    val imageLoader = LocalContext.current.imageLoader
+    val imageLoadingScope = rememberCoroutineScope()
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
+        val height = (width * sqrt(2f)).toInt()
+        val pageCount by remember(renderer) { derivedStateOf { renderer?.pageCount ?: 0 } }
+        LazyColumn(
+            verticalArrangement = verticalArrangement
+        ) {
+            items(
+                count = pageCount,
+                key = { index -> "pdf-$index" }
+            ) { index ->
+                val cacheKey = MemoryCache.Key("pdf -$index")
+                var bitmap by remember { mutableStateOf(imageLoader.memoryCache?.get(cacheKey)?.bitmap) }
+                if (bitmap == null) {
+                    DisposableEffect(file.toURI(), index) {
+                        val job = imageLoadingScope.launch(Dispatchers.IO) {
+                            val destinationBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            mutex.withLock {
+                                if (!coroutineContext.isActive) return@launch
+                                try {
+                                    renderer?.let {
+                                        it.openPage(index).use { page ->
+                                            page.render(
+                                                destinationBitmap,
+                                                null,
+                                                null,
+                                                PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                                            )
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    //Just catch and return in case the renderer is being closed
+                                    return@launch
+                                }
+                            }
+                            bitmap = destinationBitmap
+                        }
+                        onDispose {
+                            job.cancel()
+                        }
+                    }
+                    Box(modifier = Modifier
+                        .background(Color.White)
+                        .aspectRatio((1f / sqrt(2f)).toFloat())
+                        .fillMaxWidth())
+                } else {
+                    val request = ImageRequest.Builder(context)
+                        .size(width, height)
+                        .memoryCacheKey(cacheKey)
+                        .data(bitmap)
+                        .build()
+
+                    Image(
+                        modifier = Modifier
+                            .background(Color.White)
+                            .aspectRatio((1f / sqrt(2f)).toFloat())
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.Fit,
+                        painter = rememberImagePainter(request),
+                        contentDescription = "Page ${index + 1} of $pageCount"
+                    )
+                }
+            }
+        }
+    }
+}

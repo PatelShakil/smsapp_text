@@ -1,0 +1,51 @@
+package com.mycampus.smsapp.data.repo.reportfilter
+
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.reportfilter.ReportHistoryItem
+import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
+import io.ktor.client.features.ResponseException
+import io.ktor.client.features.ServerResponseException
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.url
+import io.ktor.client.statement.readText
+import javax.inject.Inject
+
+class ReportHistoryImpl @Inject constructor(
+    val httpClient: HttpClient
+) : ReportHistory {
+    override suspend fun getReportHistoryList(): Resource<ArrayList<ReportHistoryItem>> {
+        return try {
+            Resource.Success(
+                httpClient.get<ArrayList<ReportHistoryItem>> {
+                    url("http://devapi.mycampus.co.in/api/v1/Report/reporthistory?status=0")
+                    header("MODI", "3LWBgoDbDDS4nZOBmb3EI4RDknn8MaH3KJPVJnL5C5KldBY3O6tW4N3bNZRP")
+                })
+        } catch (e: ResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ClientRequestException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ServerResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: Exception) {
+            Resource.Failure(
+                errorMsgBody = e.message.toString()
+            )
+        }
+
+    }
+
+}

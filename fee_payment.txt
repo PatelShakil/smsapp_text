@@ -1,0 +1,134 @@
+//entry point
+FeePaymentCallingFun()
+
+//layout code
+
+@Composable
+fun FeePaymentCallingFun() {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = CenterHorizontally) {
+        TopFeePaymentCard(totalRecieved = 59972.0, cash = 19332.0, online = 40640.0)
+        Spacer(modifier = Modifier.height(5.dp))
+        FeePaymentCardItem()
+        Spacer(modifier = Modifier.height(5.dp))
+        FeePaymentCardItem()
+    }
+
+}
+
+@Composable
+fun TopFeePaymentCard(totalRecieved : Double,cash : Double,online : Double) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("Payment received")
+            Text(text = "₹ $totalRecieved",
+            style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier
+                .fillMaxWidth(.95f)
+                .align(CenterHorizontally)) {
+                Card(modifier = Modifier.weight(1f)){
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)) {
+                        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically) {
+                            Icon(painter = painterResource(id = R.drawable.cash_payments_ic), contentDescription = "")
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(text = "Cash")
+                        }
+                        Text("₹ $cash",
+                        style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .align(End)
+                                .padding(end = 5.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Card(modifier = Modifier.weight(1f)){
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)) {
+                        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically) {
+                            Icon(painter = painterResource(id = R.drawable.online_payment_ic), contentDescription = "")
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(text = "Online")
+                        }
+                        Text("₹ $online",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .align(End)
+                            .padding(end = 5.dp))
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(.9f), verticalAlignment = Alignment.CenterVertically) {
+                Text("TRANSACTIONS",
+                    style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(.7f))
+                Row(
+                    modifier = Modifier
+                        .weight(.3f)
+                        .clickable {
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Filter",
+                        modifier = Modifier.padding(top = 3.dp)
+                    )
+                    Icon(
+                            painter = painterResource(R.drawable.ic_filter_blue_30),
+                    contentDescription = "",
+                    tint = MainColor
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun FeePaymentCardItem() {
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+    border = BorderStroke(.5.dp, Color.Black)
+    ) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
+        horizontalArrangement = Arrangement.Center) {
+            Spacer(modifier = Modifier.width(5.dp))
+           Column(modifier = Modifier
+               .weight(.6f)) {
+               Text("Arjun",
+               style = MaterialTheme.typography.titleMedium,
+               fontWeight = FontWeight.Bold)
+               Spacer(modifier = Modifier.height(3.dp))
+               Text(text = "Physics Batch 12 installment - 2",
+               fontSize = 11.sp)
+           }
+            Column(modifier = Modifier
+               .weight(.3f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        " ₹ 20320.0",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(3.dp))
+               Text(text = "06 June 2019",
+               fontSize = 11.sp,
+               modifier = Modifier
+                   .align(End)
+                   .padding(end = 5.dp))
+           }
+        }
+
+    }
+}

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>School Admission Form</title>
+    <style>
+        .logo-img {
+            width: 200px;
+            height: 200px;
+            -webkit-clip-path: circle(50% at 50% 50%);
+            clip-path: circle(50% at 50% 50%);
+        }
+
+        .root {
+            text-decoration-color: #8c8cf7;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            display: block;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f8f8f8;
+            width: max-content;
+
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+        }
+
+        #schoolname {
+            font-size: 60px;
+            text-align: center;
+        }
+
+        #address {
+            font-size: 20px;
+            font-weight: light;
+        }
+
+        .column {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .contactrow {
+            font-size: 20px;
+        }
+
+        #sessionrow {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .stack {
+            display: flex;
+            flex-direction: column;
+            width: 150px;
+            height: 200px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #999;
+            margin: 10px;
+        }
+
+        .detail-text {
+            font-size: 20px;
+            align-items: center;
+        }
+
+        .detail-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-value {
+            border-bottom: 2px solid #080808;
+            width: max-content;
+        }
+
+        .name1 {
+            border-top: white;
+            border-left: white;
+            border-right: white;
+            padding-right: 00px;
+            width: 300px;
+        }
+
+        #cls {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 61%;
+            border-left-width: -140px;
+            margin-left: 321px;
+            margin-top: -49px;
+        }
+
+        .w3-input {
+            padding: 8px;
+            padding-left: 38px;
+            /*display: block;*/
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 73%;
+            border-left-width: -140px;
+            margin-left: 184px;
+            margin-top: -45px;
+            /* margin-bottom: 20px; */
+        }
+
+        #ar {
+            padding: 8px;
+            padding-left: 38px;
+            /*display: block;*/
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 73%;
+
+            margin-left: 201px;
+            margin-top: -45px;
+        }
+
+        #ao {
+            padding: 8px;
+            padding-left: 38px;
+            /*display: block;*/
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 73%;
+
+            margin-left: 201px;
+            margin-top: -55px;
+        }
+
+        #add_off {
+            margin-left: 134px;
+            margin-top: -21px;
+        }
+
+        #phone_resi {
+            margin-top: -61px;
+            font-size: 120%;
+        }
+
+        #phone {
+            margin-left: 212px;
+            margin-top: -56px;
+        }
+
+        #phone_off {
+            margin-left: 129px;
+            font-size: 120%;
+        }
+
+        #phone_office {
+            margin-top: -55px;
+        }
+
+        #nag {
+            margin-top: 36px;
+            font-size: 120%;
+        }
+
+        #n {
+            font-size: 120%;
+            margin-top: -43px;
+        }
+
+        #ntn {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 23%;
+            border-left-width: -140px;
+            margin-left: 184px;
+        }
+
+        #rlg {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 23%;
+            border-left-width: -140px;
+
+            margin-left: 524px;
+            margin-top: -48px;
+        }
+
+        .mother {
+
+            margin-left: 441px;
+            margin-top: -45px;
+
+        }
+
+        #fo {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 27%;
+            border-left-width: -140px;
+            margin-left: 184px;
+        }
+
+        #mo {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 35%;
+            border-left-width: -140px;
+
+            margin-left: 521px;
+            margin-top: -54px;
+        }
+
+        #efo {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 20%;
+            border-left-width: -140px;
+            margin-left: 343px;
+            margin-top: -50px;
+        }
+
+        #emo {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 28%;
+            border-left-width: -140px;
+            margin-left: 587px;
+            margin-top: -51px;
+
+        }
+
+        .mother2 {
+            margin-left: 528px;
+            margin-top: -45px;
+        }
+
+        .religion {
+            margin-left: 428px;
+            margin-top: -31px;
+        }
+
+        #guardian {
+            padding: 8px;
+            padding-left: 38px;
+            display: block;
+            border: none;
+            border-bottom: 1px solid #564848;
+            width: 61%;
+            border-left-width: -140px;
+            margin-left: 321px;
+            margin-top: -17px;
+        }
+
+        #aclass {
+            font-size: 120%;
+
+        }
+
+        #acls {
+            width: 20%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="root">
+        <div class="row" style="border-bottom: 2px dotted #080808; 
+        width: fit-content;
+        height: 250px;">
+            <img class="logo-img" src="https://4.imimg.com/data4/EA/UE/ANDROID-9039016/product-500x500.jpeg"
+                alt="School Logo">
+            <div class="column">
+                <h1 id="schoolname"></h1>
+                <p id="address"></p>
+                <p class="contactrow">
+                    <strong>Email :- </strong>
+                    <span id="schoolemail"></span>
+                    <strong>Contact :- </strong>
+                    <span id="contact"></span>
+                </p>
+            </div>
+        </div>
+        <p id="sessionrow">
+            Session : 20<span id="startyear" style="text-decoration: underline;"></span>
+            <span>-</span>
+            20<span id="endyear" style="text-decoration: underline;"></span>
+        </p>
+        <div class="row" style="
+        justify-content: space-between;
+        align-items: center;
+        ">
+            <div class="column" style="
+            padding-left: 40px;
+            ">
+                <p style="
+                    border: 3px dotted green;
+                    padding: 5px;
+                    width: max-content;
+                    ">
+                    <strong style="color: red;">Admission No. : </strong><span id="admissionno"></span>
+                </p>
+
+                <p style="padding: 5px;
+                background-color: green;
+                color: white;
+                font-weight: bold;
+                font-size: 20px;">
+                    APPLICATION FORM FOR ADMISSION
+                </p>
+            </div>
+            <div class="stack">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5IddEo4v2q0IiSOwomPKuW9MZir6McjitNw&usqp=CAU"
+                    alt="Add your Image" style="align-items: center;">
+            </div>
+        </div>
+        <div class="detail-column">
+            <p class="detail-text">
+                <strong>Name of Student : <input class="w3-input" type="text" id="firstname"> </strong>
+                <span class="detail-value" id="firstname"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Date of Birth : <input type="text" class="w3-input"> </strong>
+                <span class="detail-value" id="dob"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Father's Name: <input type="text" class="w3-input"> </strong>
+                <span class="detail-value" id="dob"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Mother's Name : <input type="text" class="w3-input"> </strong>
+                <span class="detail-value" id="mother's name"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Occupation:- Father: <input type="text" class="w3-input" id="fo">
+                    <p class="mother">Mother:</p> <input type="text" id="mo" class="w3-input">
+                </strong>
+                <span class="detail-value" id="Occupation"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Education qualifuicataion of father: <input type="text" id="efo" class="w3-input">
+                    <p class="mother2">Mother:</p> <input type="text" id="fatherqualificationlass=" w3-input">
+                </strong>
+                <span class="detail-value" id="education"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Address:- Residental: <input type="text" id="ar" class="w3-input"> <br>
+                    <p id="add_off">Office</p> <input type="text" id="ao" class="w3-input">
+                </strong>
+                <span class="detail-value" id="address"></span>
+            </p>
+            <p class="detail-text">
+                <strong>
+                    <p id="phone_resi"> phone no :-Residental: </p> <input type="tel" name="" id="phone"
+                        class="w3-input"> <br>
+                    <p id="phone_off"> Office: </p> <input type="tel" name="" class="w3-input" id="phone_office">
+                </strong>
+                <span class="detail-value" id="phone"></span>
+            </p>
+            <p class="detail-text">
+                <strong>
+                    <p id="nag"> Name and address of guardian:</p> <input type="text" name="" class="w3-input"
+                        id="guardian">
+                </strong>
+                <span class="detail-value" id="guardian"></span>
+            </p>
+            <p class="detail-text">
+                <strong>
+                    <p id="n"> Nationality: </p> <input type="text" name="" class="w3-input" id="ntn">
+                    <p class="religion">Religion:</p> <input type="text" name="" class="w3-input" id="rlg">
+                </strong>
+                <span class="detail-value" id="nationality"></span>
+            </p>
+            <p class="detail-text">
+                <strong>Class in which admission sought: <input type="text" name="" class="w3-input" id="cls"> </strong>
+                <span class="detail-value" id="class"></span>
+            </p>
+            <p class="detail-text">
+                <strong>
+                    <p id="aclass">Admitted to class:</p> <input type="text" name="" class="w3-input" id="acls">
+                </strong>
+                <span class="detail-value" id="class"></span>
+            </p>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        document.getElementById('schoolname').innerHTML = "R.D. Gyan Niketan"
+        document.getElementById('address').innerHTML = "B-650, Mittal Market, 40 Feet Road, Hind Vihar, Prem Nagar-III, Kirari Delhi-86";
+        document.getElementById('contact').innerHTML = "+1234567890";
+        document.getElementById('schoolemail').innerHTML = "rdgyanniketan@gmail.com";
+        document.getElementById('startyear').innerHTML = "23";
+        document.getElementById('endyear').innerHTML = "24";
+        document.getElementById('admissionno').innerHTML = "RPS/ABC/123";
+        document.getElementById('fistname').innerHTML = "John";
+        document.getElementById('do').innerHTML = "1990-01-01";
+        document.getElementById('middlename').innerHTML = "Micheal";
+        document.getElementById('lastname').innerHTML = "Doe";
+        document.getElementById('class').innerHTML = "10";
+        document.getElementById('section').innerHTML = "(B)";
+        document.getElementById('mobilenumber').innerHTML = "1234567890";
+        document.getElementById('email').innerHTML = "student@gmail.com";
+        document.getElementById('gender').innerHTML = "Male";
+        document.getElementById('community').innerHTML = "Community XYZ";
+
+        document.getElementById('religion').innerHTML = "Hindu";
+        document.getElementById('nationality').innerHTML = "Indian";
+        document.getElementById('bloodgroup').innerHTML = "A+";
+        document.getElementById('aadharno').innerHTML = "1234567890";
+        document.getElementById('language').innerHTML = "English";
+        document.getElementById('weight').innerHTML = "70";
+        document.getElementById('height').innerHTML = "175";
+        document.getElementById('birthplace').innerHTML = "Delhi";
+        document.getElementById('hobby').innerHTML = "Reading";
+        document.getElementById('rtecategory').innerHTML = "Yes";
+        document.getElementById('staffchild').innerHTML = "No";
+        document.getElementById('ews').innerHTML = "Yes";
+        document.getElementById('physicallychallenged').innerHTML = "No";
+        document.getElementById('fathername').innerHTML = "John Doe";
+        document.getElementById('fatherqualification').innerHTML = "Bachelor's Degree";
+        document.getElementById('fathermobileno').innerHTML = "+1234567890";
+        document.getElementById('fatheroccupation').innerHTML = "Engineer";
+        document.getElementById('fatherannualincome').innerHTML = "$50,000";
+        document.getElementById('mothername').innerHTML = "Jane Doe";
+        document.getElementById('motherqualification').innerHTML = "Bachelor's Degree";
+        document.getElementById('mothermobileno').innerHTML = "+1234567890";
+        document.getElementById('motheroccupation').innerHTML = "Engineer";
+        document.getElementById('motherannualincome').innerHTML = "$50,000";
+        document.getElementById('guardianname').innerHTML = "John Smith";
+        document.getElementById('guardianqualification').innerHTML = "Master's Degree";
+        document.getElementById('guardianmobileno').innerHTML = "+1234567890";
+        document.getElementById('guardianoccupation').innerHTML = "Doctor";
+        document.getElementById('guardianannualincome').innerHTML = "$100,000";
+    </script>
+</body>
+
+</html>

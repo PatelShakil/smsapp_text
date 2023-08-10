@@ -1,0 +1,198 @@
+//calling fun
+
+StudentTopLegendCard(
+            totalCount = 10,
+            maleCount = 9,
+            femaleCount = 2
+        ) { isName, isRoll, isAdm, isAc ->
+
+        }
+
+//layout main composable fun
+
+@Composable
+fun StudentTopLegendCard(
+    totalCount: Int, maleCount: Int, femaleCount: Int, isFeeWindow: Boolean = false,
+    onFilterCheckedChange: (isName: Boolean, isRoll: Boolean, isAdm: Boolean, isAc: Boolean) -> Unit
+) {
+    val spacing = MaterialTheme.spacing
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+        .clickable { }) {
+        Column(
+            //modifier = Modifier.padding(spacing.medium)
+            //modifier = Modifier.background(Color(0xFFF3D9D5), RoundedCornerShape(12.dp))
+            modifier = Modifier.background(LightMainColor, RoundedCornerShape(12.dp))
+        ) {
+            Row {
+                Text(
+                    text = "Total Results ( ${totalCount} )",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(top = spacing.small)
+                        .weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            Divider(modifier = Modifier.padding(bottom = spacing.small))
+
+            if (isFeeWindow) {
+                Row {
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Unpaid - ${femaleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Paid - ${maleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            } else {
+                Row {
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .width(20.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFD3E9E1))
+                                .border(1.dp, Color(0xFF05AC64), CircleShape)
+                                .padding(end = 3.dp)
+                        )
+                        Text(
+                            text = "Male - ${maleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .width(20.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE3E1F7))
+                                .border(1.dp, Color(0xFF283B5B), CircleShape)
+                                .padding(end = 3.dp)
+                        )
+                        Text(
+                            text = "Female - ${femaleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            }
+            Divider(modifier = Modifier.padding(bottom = spacing.small))
+            var isName by remember { mutableStateOf(false) }
+            var isRoll by remember { mutableStateOf(false) }
+            var isAdm by remember { mutableStateOf(false) }
+            var isAC by remember { mutableStateOf(false) }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(.95f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CustomFilterChip(isChecked = isName, label = "Name", onCheckedChange = {
+                    isName = it
+                    if(isName){
+                        isRoll = false
+                        isAdm = false
+                        isAC = false
+                    }
+                    onFilterCheckedChange(isName, isRoll, isAdm, isAC)
+                })
+                Spacer(modifier = Modifier.width(15.dp))
+                CustomFilterChip(isChecked = isRoll, label = "Roll No.", onCheckedChange = {
+                    isRoll = it
+                    if (isRoll) {
+                        isName = false
+                        isAdm = false
+                        isAC = false
+                    }
+                    onFilterCheckedChange(isName, isRoll, isAdm, isAC)
+                })
+                Spacer(modifier = Modifier.width(15.dp))
+                CustomFilterChip(isChecked = isAdm, label = "Adm", onCheckedChange = {
+                    isAdm = it
+                    if (isAdm) {
+                        isName = false
+                        isRoll = false
+                        isAC = false
+                    }
+                    onFilterCheckedChange(isName, isRoll, isAdm, isAC)
+                })
+                Spacer(modifier = Modifier.width(15.dp))
+                CustomFilterChip(isChecked = isAC, label = "A/C", onCheckedChange = {
+                    isAC = it
+                    if (isAC) {
+                        isName = false
+                        isRoll = false
+                        isAdm = false
+                    }
+                    onFilterCheckedChange(isName, isRoll, isAdm, isAC)
+                })
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+}
+
+//required fun
+@Composable
+fun CustomFilterChip(isChecked: Boolean, label: String, onCheckedChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable {
+                onCheckedChange(!isChecked)
+            }
+            .border(
+                BorderStroke(.5.dp, if (isChecked) Color.Transparent else Color.Gray),
+                RoundedCornerShape(15.dp)
+            )
+            .background(
+                if (isChecked) Color.White else Color.Transparent,
+                RoundedCornerShape(15.dp)
+            )
+            .padding(horizontal = 5.dp)
+    ) {
+        if(isChecked){
+            Icon(Icons.Default.Check, contentDescription = "",
+            tint = MainColor,
+            modifier = Modifier.size(20.dp))
+        }
+        Text(
+            label, style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 2.dp),
+            fontWeight = FontWeight.Black,
+            color = if (isChecked) MainColor else Color.Black,
+        )
+    }
+}

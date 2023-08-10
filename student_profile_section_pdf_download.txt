@@ -1,0 +1,277 @@
+//repo code
+
+//interface
+import java.io.File
+
+interface DownloadProfile {
+    suspend fun downloadPDFFile(url: String, fileName: String, onPdfDownload: (File?) -> Unit)
+}
+
+//implementation
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.URL
+import javax.inject.Inject
+
+class DownloadProfileImpl @Inject constructor() : DownloadProfile {
+    override suspend fun downloadPDFFile(
+        url: String,
+        fileName: String,
+        onPdfDownload: (File?) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val storageDir = "/storage/emulated/0/Download/myCampus"
+                if (!File(storageDir).exists())
+                    File(storageDir).mkdirs()
+                val file = File(storageDir, fileName)
+                if (!file.exists())
+                    file.createNewFile()
+
+                val connection = URL(url).openConnection()
+                connection.connect()
+
+                val inputStream: InputStream = connection.getInputStream()
+                val outputStream = FileOutputStream(file)
+
+                val buffer = ByteArray(4096)
+                var bytesRead: Int = inputStream.read(buffer)
+                while (bytesRead != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                    bytesRead = inputStream.read(buffer)
+                }
+
+                outputStream.close()
+                inputStream.close()
+
+                onPdfDownload(file)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+}
+
+//viewModel code 
+
+fun downloadPDFFile(url: String, fileName: String, onPdfDownload: (File?) -> Unit) =
+        viewModelScope.launch {
+            repo.downloadPDFFile(url, fileName) {
+                onPdfDownload(it)
+            }
+        }
+
+
+// ***IMP***   in StudentDashboardMainScreen() fun replace the call 
+// of StudentProfileSection() with below call 
+
+ val context = LocalContext.current
+
+        StudentProfileSection(
+            StudentsProfileData(
+                "",
+                "John Doe",
+                "10",
+                "B",
+                "RPS/ABC/123",
+                R.drawable.qr_code_image
+            )
+        ) {
+//in below viewModel fun call pass the link of pdf and the name of pdf file 
+            if (checkPermission(context)) {
+                viewModel.downloadPDFFile(
+                    "https://www.africau.edu/images/default/sample.pdf",
+                    "Sample.pdf"
+                ) {
+                    ViewPDF(it?.absolutePath!!, context)
+                }
+            } else {
+                checkPermission(context)
+            }
+        }
+
+// StudentProfileSection() fun
+
+@Composable
+fun StudentProfileSection(data: StudentsProfileData, onDownloadClicked: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(top = 5.dp)
+            .fillMaxWidth(.95f)
+            .background(White)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(top = 20.dp)
+                .border(
+                    .5.dp, Gray,
+                    RoundedCornerShape(15.dp)
+                ),
+            shape = RoundedCornerShape(15.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(White)
+                    .padding(), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                        .padding()
+                        .fillMaxWidth()
+                        .background(LightMainColor)
+                )
+
+                Spacer(modifier = Modifier.height(60.dp))
+                Text(
+                    data.name + " -" + data.classname + " (${data.section})",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Admission No - ${data.admissionno}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MainColor
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Box(
+                    modifier = Modifier
+                        .border(3.dp, MainColor, RoundedCornerShape(5.dp))
+                        .padding(5.dp)
+                        .size(130.dp)
+                ) {
+                    Image(
+                        painterResource(id = R.drawable.qr_code_image),
+                        contentDescription = "QR code Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .align(Alignment.Center)
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(.9f)
+                ) {
+                    Button(onClick = { /*TODO*/ }, modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Disable",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = White
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Button(onClick = { /*TODO*/ }, modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Pay Category",
+                            color = White,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+                Button(
+                    onClick = {
+                        onDownloadClicked()
+                    },
+                    modifier = Modifier.fillMaxWidth(.9f)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_download),
+                        contentDescription = "",
+                        tint = White,
+                    )
+                    androidx.compose.material3.Text(
+                        "Download",
+                        color = White
+                    )
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(
+                    modifier = Modifier
+                        .height(10.dp)
+                        .fillMaxWidth()
+                        .background(LightMainColor)
+                )
+            }
+        }
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+//            Image(
+//                painter = rememberAsyncImagePainter(model = data.profileurl),
+//                contentDescription = "Profile Image",
+//                modifier = Modifier
+//                    .clip(CircleShape)
+//                    .height(100.dp)
+//                    .width(100.dp),
+//                contentScale = ContentScale.Crop,
+//            )
+            CoilImage(
+                imageModel = { data.profileurl }, // loading a network image or local resource using an URL.
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                ),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .height(100.dp)
+                    .width(100.dp)
+            )
+        }
+    }
+}
+
+
+// required functions
+
+fun ViewPDF(filePath: String, ctx: Context) {
+    if (checkPermission(ctx)) {
+        val file = FileProvider.getUriForFile(
+            ctx,
+            "com.mycampus.smsapp.fileprovider",
+            File(filePath)
+        )
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        intent.clipData = ClipData.newRawUri("", file)
+        intent.setDataAndType(file, "application/pdf")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val chooserIntent = Intent.createChooser(intent, "Open PDF with")
+        chooserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        try {
+            ctx.startActivity(chooserIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    } else {
+        checkPermission(ctx)
+        ViewPDF(filePath, ctx)
+
+    }
+}
+
+fun checkPermission(ctx: Context): Boolean {
+    val permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    val grantResults = permissions.map {
+        ContextCompat.checkSelfPermission(ctx, it)
+    }.toIntArray()
+
+    if (grantResults.contains(PackageManager.PERMISSION_DENIED)) {
+        ActivityCompat.requestPermissions(ctx as Activity, permissions, 1)
+
+    }
+    return grantResults.contains(PackageManager.PERMISSION_GRANTED)
+}

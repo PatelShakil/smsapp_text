@@ -1,0 +1,151 @@
+data class PaymentHeaderData(
+    val total:String,
+    val feePayments: String,
+    val otherPayments:String
+)
+data class PaymentSampleItemData(
+    val icon : Int,
+    val title : String,
+    val amount:Double,
+    val discount:Double,
+    val recieptNo:String,
+    val time : LocalDateTime
+)
+@Composable
+fun PaymentHeader(data: PaymentHeaderData) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+    shape  = RoundedCornerShape(15.dp),
+    elevation = CardDefaults.cardElevation(30.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Box(modifier = Modifier
+                    .padding(top = 10.dp)
+                    .clip(CircleShape)
+                    .height(60.dp)
+                    .width(60.dp)
+                    .background(LightMainColor, CircleShape)){
+                    Icon(painterResource(id = R.drawable.ic_rupee_blue),"",
+                        tint = MainColor,
+                        modifier = Modifier
+                            .height(30.dp)
+                            .width(30.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+                Text( "₹" +data.total,
+                    fontSize = 22.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth())
+                Text( "Till Now",
+                    fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth())
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(5.dp))
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .border(.5.dp, Gray, RoundedCornerShape(bottomStart = 15.dp)), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "(Fee Payments)",
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            text = "₹" + data.feePayments,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .border(.5.dp, Gray, RoundedCornerShape(bottomEnd = 15.dp)), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "(Other Payments)",fontSize = 12.sp
+                    )
+                    Text(
+                        text = "₹" +data.otherPayments,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun PaymentSampleItem(data : PaymentSampleItemData) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Color.Gray, RoundedCornerShape(15.dp)),
+    shape = RoundedCornerShape(15.dp),
+        elevation = CardDefaults.cardElevation(30.dp)
+    ) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically){
+            Column(modifier = Modifier
+                .weight(.6f)
+                .padding(start = 10.dp)) {
+                Text(text = "₹"+ data.amount.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold)
+                Text(text = data.title,
+                    style = MaterialTheme.typography.bodySmall)
+                Row {
+                    Icon(painterResource(id = R.drawable.discount_ic),"",
+                        tint = MainColor,
+                        modifier = Modifier.height(24.dp).width(24.dp))
+                    Text(
+                        text = "Discount : ₹" + data.discount.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                Row {
+                    Icon(painterResource(id = R.drawable.ic_baseline_print_blue_50),"",
+                    tint = MainColor,
+                    modifier = Modifier.height(24.dp).width(24.dp))
+                    Text(
+                        text = data.recieptNo,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+                Row {
+                    Icon(painterResource(id = R.drawable.ic_calender_dashboard),"",
+                    tint  = MainColor)
+                    Text(
+                        text = data.time.format(DateTimeFormatter.ofPattern("dd-MM-yy hh-mm a")),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top  =3.dp)
+                    )
+                }
+            }
+            Box(modifier = Modifier
+                .weight(.4f)
+                .padding(end = 15.dp)) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .clip(CircleShape)
+                        .height(70.dp)
+                        .width(70.dp)
+                        .background(LightMainColor, CircleShape)
+                        .align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        painterResource(id = data.icon), "",
+                        tint = MainColor,
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(40.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+        }
+    }
+}

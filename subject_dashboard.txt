@@ -1,0 +1,300 @@
+//Launching this code 
+
+SubjectDashBoardMainScreen()
+
+@Composable
+fun SubjectEmployeeDashBoardTopCard() {
+    val spacing = MaterialTheme.spacing
+    val educationalYear = "2022-23"
+    androidx.compose.material.Card(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.background(Color(0xFFFEFEFE))) {
+            val (cardNameText,cardImage,currentYearText) = createRefs()
+            androidx.compose.material.Text(text = "Subject and Employee",
+                modifier = Modifier
+                    .padding(start = spacing.medium, top = spacing.medium / 2)
+                    .constrainAs(cardNameText) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.5f)
+                    .background(Color(0xFFF9FCF5)),
+                style = MaterialTheme.typography.titleMedium,
+                color = MainColor,
+                fontSize = 19.sp,
+                softWrap = true)
+            Image(painterResource(id = R.drawable.subject_employee_dashboard), contentDescription = "noticeboard",
+                modifier = Modifier
+                    .constrainAs(cardImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .height(120.dp)
+                    .width(150.dp),
+                contentScale = ContentScale.FillBounds)
+
+
+            Box(modifier = Modifier
+                .padding(start = spacing.medium)
+                .border(1.dp, Color.Gray, CircleShape)
+                .constrainAs(currentYearText) {
+                    top.linkTo(cardNameText.bottom)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+                .background(Color.White, CircleShape)) {
+                androidx.compose.material.Text(text = "$educationalYear", modifier = Modifier
+                    .padding(horizontal = spacing.medium / 2)
+                )
+            }
+        }
+    }
+}
+@Composable
+fun SubjectDashBoardMainScreen() {
+    Column(modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally) {
+        SubjectEmployeeDashBoardTopCard()
+        Spacer(modifier = Modifier.height(10.dp))
+        SubjectDashBoardTopCard()
+        Spacer(modifier = Modifier.height(10.dp))
+        SubjectNavigationCardSA()
+        Spacer(modifier = Modifier.height(10.dp))
+        SubjectNavigationCardES()
+    }
+}
+
+@Composable
+fun SubjectNavigationCardSA() {
+    Card(modifier = Modifier.fillMaxWidth( .95f),
+    border = BorderStroke(.5.dp,Gray)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(White), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(modifier = Modifier
+                .height(25.dp)
+                .fillMaxWidth()
+                .background(LightMainColor), horizontalArrangement = Arrangement.Center){
+                Text("Subject and Assignment",
+                style = MaterialTheme.typography.titleSmall)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(.95f), horizontalArrangement = Arrangement.Center) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_book, label = "Subject") {
+
+                    }
+                }
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_books_groups, label = "Subject Group") {
+
+                    }
+                }
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_assignment, label = "Assignment") {
+
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier
+                .height(10.dp)
+                .fillMaxWidth()
+                .background(LightMainColor))
+        }
+    }
+}
+@Composable
+fun SubjectNavigationCardES() {
+    Card(modifier = Modifier.fillMaxWidth( .95f),
+    border = BorderStroke(.5.dp,Gray)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(White), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(modifier = Modifier
+                .height(25.dp)
+                .fillMaxWidth()
+                .background(LightMainColor), horizontalArrangement = Arrangement.Center){
+                Text("Employee and Search",
+                style = MaterialTheme.typography.titleSmall)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(.95f)
+                , horizontalArrangement = Arrangement.Start) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_person, label = "Employee") {
+
+                    }
+                }
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_person_search_blue_50, label = "Search") {
+
+                    }
+                }
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
+                    NavCardNavItem(icon = R.drawable.ic_enrollment, label = "Enroll") {
+
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier
+                .height(10.dp)
+                .fillMaxWidth()
+                .background(LightMainColor))
+        }
+    }
+}
+
+@Composable
+fun NavCardNavItem(icon : Int,label: String,onClick:()->Unit) {
+    Column( horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier
+        .clickable {
+            onClick()
+        }) {
+        Box(modifier = Modifier
+            .size(50.dp)
+            .clip(CircleShape)
+            .background(LightMainColor),
+            contentAlignment = Alignment.Center){
+            Icon(painter = painterResource(id = icon), contentDescription = "",
+            tint = MainColor,
+                modifier = Modifier.size(35.dp))
+        }
+        Text(label,
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.Center)
+    }
+}
+@Composable
+fun SubjectDashBoardTopCard() {
+    val cardBg = Color(0xFF00638E)
+    Column(modifier = Modifier.fillMaxWidth(.95f), horizontalAlignment = Alignment.CenterHorizontally){
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(cardBg),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically) {
+                        Spacer(modifier = Modifier.width(20.dp))
+                        Icon(painter = painterResource(id = R.drawable.ic_book), contentDescription = "",
+                        tint = White,
+                        modifier = Modifier
+                            .size(30.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Column() {
+                            Text("2",
+                                color = White,
+                            fontSize = 16.sp)
+                            Text("Subject",
+                                color = White,
+                                style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+            Spacer(Modifier.width(20.dp))
+            Card(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(cardBg),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Icon(painter = painterResource(id = R.drawable.ic_books_groups), contentDescription = "",
+                            tint = White,
+                            modifier = Modifier
+                                .size(30.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Column() {
+                            Text("15",
+                                color = White,
+                                fontSize = 16.sp)
+                            Text("Subject Group",
+                                color = White,
+                                style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(cardBg),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Icon(painter = painterResource(id = R.drawable.ic_person), contentDescription = "",
+                            tint = White,
+                            modifier = Modifier
+                                .size(30.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Column() {
+                            Text("2",
+                                color = White,
+                                fontSize = 16.sp)
+                            Text("Employee",
+                                color = White,
+                                style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+            Spacer(Modifier.width(20.dp))
+            Card(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(cardBg),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Icon(painter = painterResource(id = R.drawable.ic_assignment), contentDescription = "",
+                            tint = White,
+                            modifier = Modifier
+                                .size(30.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Column() {
+                            Text("2",
+                                color = White,
+                                fontSize = 16.sp)
+                            Text("Assignment",
+                                color = White,
+                                style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}

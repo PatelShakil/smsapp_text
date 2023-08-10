@@ -1,0 +1,133 @@
+@Composable
+fun StudenstInfoCard(studentDBuid: String, classid :String, sectionid: String, name: String, schoolAdmissionNo: String, contactNo: String, gender: String, imageURL:String, navController: NavController, onClick: () -> Unit,isAdminSection: Boolean=true) {
+    var counter=0
+    val painter= rememberAsyncImagePainter(model = imageURL)
+    val spacing = MaterialTheme.spacing
+    val context = LocalContext.current
+
+    androidx.compose.material3.Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+            .clickable {
+                
+            }
+    )
+    {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(5.dp)
+                .padding(5.dp)
+        )
+        {
+            Image(
+                painter = painter,
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        //launcher.launch("image/jpeg")
+                    }
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = name,
+                    fontSize = 14.sp,
+                    //color = Color.Gray,
+                    modifier = Modifier.padding(top = 5.dp),
+                    fontWeight = FontWeight.Bold
+
+                )
+
+
+                Text(
+                    text = "Admission no - $schoolAdmissionNo",
+                    fontSize = 12.sp,
+                    //color = Color.Gray,
+                    //modifier = Modifier.padding(12.dp),
+                    fontWeight = FontWeight.Bold
+                )
+
+
+                Text(
+                    // text = "Admission Date-  ${context.toDateString(studentDTO.admissiondate)}",
+                    text = "Contact No-  $contactNo",
+                    fontSize = 12.sp,
+                    //color = Color.Gray,
+                    //modifier = Modifier.padding(12.dp),
+                    fontWeight = FontWeight.Bold
+                )
+
+                if(isAdminSection){
+                    Row() {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(spacing.small))
+                                .wrapContentWidth()
+                                //.padding(start =padding.dp )
+                                .background(MaterialTheme.colorScheme.primary)
+                                .clickable() {
+                                    navController.navigate("studentindinfo/${studentDBuid}")
+
+                                }
+                        ) {
+                            Text(
+                                text = "View Profile",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondary ,
+                                modifier = Modifier.padding(top = spacing.extraSmall, bottom = spacing.extraSmall, start = spacing.small, end = spacing.small)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(spacing.small))
+                                .wrapContentWidth()
+                                //.padding(start =padding.dp )
+                                .background(MaterialTheme.colorScheme.primary)
+                                .clickable() {
+                                    val oldVal = '/'
+                                    val newVal = '*'
+                                    val formattedAdmNo = schoolAdmissionNo.replace(oldVal, newVal)
+                                    navController.navigate("feeinfo/${studentDBuid}/${classid}/${sectionid}/${name}/${formattedAdmNo}/${contactNo}")
+                                }
+                        ) {
+                            Text(
+                                text = "Pay Details",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondary ,
+                                modifier = Modifier.padding(top = spacing.extraSmall, bottom = spacing.extraSmall, start = spacing.small, end = spacing.small)
+                            )
+                        }
+                    }
+                }
+                else{
+                    Row(){
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(spacing.small))
+                                .wrapContentWidth()
+                                //.padding(start =padding.dp )
+                                .background(if(gender.lowercase()=="male")Color(0xFF2F3B81) else Color(0xFFE91E63))
+                        ) {
+                            Text(
+                                text = "I'm your ${gender.lowercase()} Mate",
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondary ,
+                                modifier = Modifier.padding(top = spacing.extraSmall, bottom = spacing.extraSmall, start = spacing.small, end = spacing.small)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

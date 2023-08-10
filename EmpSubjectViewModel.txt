@@ -1,0 +1,73 @@
+package com.mycampus.smsapp.ui.main.adminhome.empandsubject
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.adminsettings.subject.SubjectInfoItem
+import com.mycampus.smsapp.data.models.adminsettings.subjectmapping.SubjectMappingItem
+import com.mycampus.smsapp.data.repo.subjectmapping.SubjectMP
+import com.mycampus.smsapp.data.repo.subjects.Subject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class EmpSubjectViewModel @Inject constructor(
+    private val subjectRepo: Subject,
+    private val subjectMappingRepo: SubjectMP
+) : ViewModel() {
+
+    fun createSubject(subject: List<SubjectInfoItem>) = viewModelScope.launch {
+        subjectRepo.createSubject(subject).let {
+            when (it) {
+                is Resource.Success -> {
+                    getSubjectList(null)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    fun updateSubject(subject: List<SubjectInfoItem>) = viewModelScope.launch {
+        subjectRepo.updateSubject(subject).let {
+            when (it) {
+                is Resource.Success -> {
+                    getSubjectList(null)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+    private val _subjectList = MutableStateFlow<Resource<ArrayList<SubjectInfoItem>>?>(null)
+    val subjectList: StateFlow<Resource<ArrayList<SubjectInfoItem>>?> = _subjectList
+
+    private val _subjectGroupList = MutableStateFlow<Resource<ArrayList<SubjectMappingItem>>?>(null)
+    val subjectGroupList: StateFlow<Resource<ArrayList<SubjectMappingItem>>?> = _subjectGroupList
+
+    init {
+        getSubjectMappingList(null, null, null)
+        init()
+    }
+
+    fun init() = viewModelScope.launch {
+        getSubjectList(null)
+    }
+
+    private suspend fun getSubjectList(subjectId: String?) {
+        _subjectList.value = Resource.Loading
+        _subjectList.value = subjectRepo.getSubjects(subjectId)
+    }
+
+    fun getSubjectMappingList(groupid: String?, classid: String?, sectionid: String?) =
+        viewModelScope.launch {
+            _subjectGroupList.value = Resource.Loading
+            _subjectGroupList.value =
+                subjectMappingRepo.getSubjectMapping(groupid, classid, sectionid)
+        }
+}

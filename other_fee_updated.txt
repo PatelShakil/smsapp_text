@@ -1,0 +1,161 @@
+data class FinalData(
+    val itemName :String,
+    val amount : Int
+)
+data class CollectFeeData(
+    val totalAmount : Int,
+    val discount: Int,
+    val list:List<FinalData>
+)
+@Composable
+fun MainScreenFees(onProceedClicked : (List<CollectFeeData>) -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .padding(top = 5.dp)) {
+        val isAddClick = remember {
+            mutableStateOf(1)
+        }
+        val feeDataList = mutableListOf<CollectFeeData>()
+     Column(modifier = Modifier
+         .fillMaxWidth()
+         .verticalScroll(ScrollState(0), true),
+     horizontalAlignment = Alignment.CenterHorizontally) {
+         Spacer(modifier = Modifier.height(5.dp))
+         Row(modifier = Modifier.fillMaxWidth(.95f)) {
+             Text("Collect other Fee",
+                 modifier = Modifier
+                     .padding(top = 5.dp)
+                     .weight(.8f))
+             Box(
+                 modifier = Modifier
+                     .wrapContentHeight()
+                     .weight(.2f)
+             ) {
+                 Icon(imageVector = Icons.Default.Add, contentDescription = "",
+                     modifier = Modifier
+                         .height(30.dp)
+                         .width(30.dp)
+                         .clip(CircleShape)
+                         .align(Alignment.CenterEnd)
+                         .background(Color.White)
+                         .clickable {
+                             isAddClick.value++
+                         })
+             }
+         }
+         Divider(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .height(1.dp)
+         )
+         Spacer(modifier = Modifier.height(5.dp))
+
+        var totalAmount = 0
+         var discountAmount = 0
+         Box(modifier = Modifier.fillMaxWidth(.94f), contentAlignment = Alignment.Center) {
+             Text(
+                 "Item Name", modifier = Modifier.align(Alignment.TopStart),
+                 style = MaterialTheme.typography.bodyMedium
+             )
+             Text(
+                 "Item Amount", modifier = Modifier.align(Alignment.TopEnd),
+                 style = MaterialTheme.typography.bodyMedium
+             )
+         }
+         Divider(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .height(1.dp)
+         )
+         val listOfFinalData = mutableListOf<FinalData>()
+         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+             repeat(isAddClick.value) {
+                 Row(verticalAlignment = Alignment.CenterVertically,
+                 horizontalArrangement = Arrangement.Center) {
+                     val amount = remember {
+                         mutableStateOf(0)
+                     }
+                     val item = remember { mutableStateOf("") }
+                     Row(modifier = Modifier.fillMaxWidth(.95f), verticalAlignment = Alignment.CenterVertically) {
+//                         DropDownSample(label = "", placeHolder = "", list = itemsList, onSelect = {
+//                             item.value = it
+//                         }, onAmountFixed = {
+//                             amount.value = it
+//                         })
+                         Text(text = "${it + 1}",modifier = Modifier.weight(.08f))
+                         TextField(value = item.value, onValueChange = {item.value = it},
+                         modifier =Modifier.weight(.62f),
+                         placeholder = {Text("Enter item name",style = MaterialTheme.typography.bodySmall)},
+                             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFDBE2EA))
+                         )
+                         Box(modifier =Modifier.weight(.3f)) {
+                             getAmount(onAmountSet = {amount.value = it})
+                         }
+                     }
+                     totalAmount += amount.value
+
+                     listOfFinalData.add(FinalData(item.value,amount.value))
+                 }
+             }
+
+         }
+
+         val checkState1 = remember{ mutableStateOf(false) }
+         Spacer(modifier = Modifier.height(5.dp))
+         Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+             .clickable {
+                 checkState1.value = !checkState1.value
+             }
+             .fillMaxWidth(.95f)) {
+             Text(text = "Any Add On Discount",modifier = Modifier.weight(.9f))
+             Checkbox(
+                 modifier = Modifier.weight(.1f),
+                 checked = checkState1.value,
+                 onCheckedChange = { checkState1.value = !checkState1.value })
+         }
+         Divider(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .height(1.dp)
+         )
+         val discount = remember{ mutableStateOf(0) }
+         Spacer(modifier = Modifier.height(5.dp))
+         if (checkState1.value){
+             TextField(modifier = Modifier.fillMaxWidth(), value = discount.value.toString(), onValueChange = {
+                 if(it.isNotEmpty()) {
+                     discount.value = it.toInt()
+                     discountAmount = discount.value
+                 }
+             },
+                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFDBE2EA))
+             )
+         }else{
+             discount.value = 0
+         }
+         feeDataList.add(CollectFeeData(totalAmount,discount.value,listOfFinalData))
+         Spacer(modifier = Modifier.height(10.dp))
+
+         Button(onClick = { onProceedClicked(feeDataList)  }) {
+             Text("Pay Rs ${totalAmount - discount.value}",color = Color.White,
+                 style = MaterialTheme.typography.titleSmall,
+                 modifier = Modifier              )
+             
+         }
+
+         Spacer(modifier = Modifier.height(5.dp) )
+    }
+    }
+}
+@Composable
+fun getAmount(onAmountSet:(Int)-> Unit) {
+    val amount = remember{ mutableStateOf(0) }
+    TextField(value = amount.value.toString(), onValueChange = {
+        if(it.isNotEmpty()) {
+        amount.value = it.toInt()
+        }
+        onAmountSet(amount.value)},
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFDBE2EA))
+    )
+}

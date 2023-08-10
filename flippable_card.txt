@@ -1,0 +1,102 @@
+//import statements
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.input.pointer.pointerInput
+
+
+//calling function of flippable card
+
+@Composable
+fun FlippableCardCallingFun(navController: NavController) {
+    FlippableBox(
+        FrontCard = {
+            StudentInfoCard(
+                admissionType = "RPS/2020/18",
+                studentDBuid = "1234",
+                classid = "1",
+                classname = "10",
+                sectionid = "a",
+                sectionName = "A",
+                name = "Sunil Patel",
+                fathername = "Shailesh",
+                schoolAdmissionNo = "50",
+                contactNo = "1234567890",
+                gender = "Male",
+                imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSw51rwATqrkSFobUbRD703yQyeacRHVnMuw&usqp=CAU",
+                navController = navController,
+                onClick = { /*TODO*/ })
+        },
+        BackCard = {
+            Card(modifier = Modifier.fillMaxWidth(.95f)) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.student_det),
+                    contentDescription = "",
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
+    )
+}
+
+
+
+
+
+
+//required class
+
+enum class FlipState {
+    FRONT, BACK
+}
+
+//main container of these cards which can flippable
+
+@Composable
+fun FlippableBox(FrontCard : @Composable () -> Unit,BackCard : @Composable () -> Unit) {
+    var flipState by remember { mutableStateOf(FlipState.FRONT) }
+
+    val transition = updateTransition(targetState = flipState, label = "")
+    val offsetX by transition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = 500, easing = FastOutSlowInEasing)
+        }
+    ) { state ->
+        if (state == FlipState.FRONT) 0f else 15f // Adjust the value as per your layout
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectDragGestures { _, dragAmount ->
+                    if (dragAmount.y > 0 && flipState == FlipState.FRONT) {
+                        flipState = FlipState.BACK
+                    } else if (dragAmount.y < 0 && flipState == FlipState.BACK) {
+                        flipState = FlipState.FRONT
+                    }
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(y = offsetX.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (flipState == FlipState.FRONT) {
+                // Content of the front side
+                FrontCard()
+
+            } else {
+                // Content of the back side
+                BackCard()
+            }
+        }
+    }
+}

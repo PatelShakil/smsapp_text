@@ -1,0 +1,181 @@
+
+//viewModel code
+
+private val _subjectList = MutableStateFlow< Resource<ArrayList<SubjectInfoItem>>?>(null)
+    val subjectList : StateFlow<Resource<ArrayList<SubjectInfoItem>>?> = _subjectList
+
+    fun init() = viewModelScope.launch{
+        getSubjectList()
+    }
+    private suspend fun getSubjectList(){
+        _subjectList.value = Resource.Loading
+        _subjectList.value = subjectRepo.getSubjects()
+    }
+
+//layout file code
+
+@Composable
+fun SubjectCallingFunction(viewModel : HomeViewModel) {
+    Column {
+        SubjectTopCard()
+        viewModel.init()
+        val subjectList = viewModel.subjectList.collectAsState()
+        subjectList.value.let {
+            when(it){
+                is Resource.Failure -> {
+
+                    if(it.errorMsgBody.contains("204"))
+                        onAPIFailed("No data for Subjects ",false)
+                    else
+                        onAPIFailed("Error Info (${it.errorCodeDescription}-${it.errorCode})")
+                }
+                Resource.Loading -> {
+                    FullScreenProgressbar()
+                }
+                is Resource.Success ->{
+                    if (it.result.isEmpty()) {
+                        //Need to Handle Empty Screen
+                    } else {
+                        SubjectMainScreen(it.result)
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+}
+@Composable
+fun SubjectMainScreen(result: ArrayList<SubjectInfoItem>) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .verticalScroll(ScrollState(0), true), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(10.dp))
+        result.forEach {
+                SubjectCardItem(data = it)
+                Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+@Composable
+fun SubjectTopCard() {
+    val spacing = MaterialTheme.spacing
+    val educationalYear = "2022-23"
+    androidx.compose.material.Card(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.background(Color(0xFFFEFEFE))) {
+            val (cardNameText,cardImage,currentYearText) = createRefs()
+            androidx.compose.material.Text(text = "Your All Subjects are here!",
+                modifier = Modifier
+                    .padding(start = spacing.medium, top = spacing.medium / 2)
+                    .constrainAs(cardNameText) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.5f)
+                    .background(Color(0xFFFEFEFE)),
+                style = MaterialTheme.typography.titleMedium,
+                color = MainColor,
+                fontSize = 19.sp,
+                softWrap = true)
+            Image(painterResource(id = R.drawable.subjects_topcard), contentDescription = "noticeboard",
+                modifier = Modifier
+                    .constrainAs(cardImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .height(120.dp)
+                    .width(150.dp),
+                contentScale = ContentScale.FillBounds)
+
+
+            Box(modifier = Modifier
+                .padding(start = spacing.medium)
+                .border(1.dp, Color.Gray, CircleShape)
+                .constrainAs(currentYearText) {
+                    top.linkTo(cardNameText.bottom)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+                .background(Color.White, CircleShape)) {
+                androidx.compose.material.Text(text = "$educationalYear", modifier = Modifier
+                    .padding(horizontal = spacing.medium / 2)
+                )
+            }
+        }
+    }
+}
+@Composable
+fun SubjectCardItem(data : SubjectInfoItem) {
+    Card(modifier = Modifier.fillMaxWidth(.95f)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFDAE1E9)),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Row( verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier
+                    .width(10.dp)
+                    .height(130.dp)
+                    .background(Color(0xFF263B5A)))
+                Spacer(modifier = Modifier.width(5.dp))
+                Column() {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(.7f)) {
+                            Text(
+                                "Name : " + data.subjectname,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                "Code : " + data.subjectcode,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                text = "Type : " + data.subjecttype.name + " (${data.subjectcat.name})",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                "Description : ",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                data.subjectdescription,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp
+                            )
+                        }
+                        Spacer(Modifier.width(5.dp))
+                        Box(
+                            modifier = Modifier
+                                .height(70.dp)
+                                .width(70.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF263B5A))
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_book),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .height(50.dp)
+                                    .width(50.dp),
+                                tint = Color.White
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}

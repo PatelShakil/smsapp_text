@@ -1,0 +1,228 @@
+data class ProfileHearderData(
+    val schoolName : String,
+    val boardName : String,
+    val medium :String,
+    val shift : String,
+    val timing : String,
+    val profile : String
+)
+@Composable
+fun SchoolDashboardProfileHeader(data: ProfileHearderData) {
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+    shape = RoundedCornerShape(15.dp)
+    ) {
+        ConstraintLayout(modifier = Modifier                    .background(White)
+        ) {
+            val (content,profile) = createRefs()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+                    .border(.5.dp, Gray, RoundedCornerShape(15.dp))
+                    .constrainAs(content){
+                                         top.linkTo(profile.top)
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                        .background(LightMainColor)
+                        .fillMaxWidth()
+                )
+                Column(modifier = Modifier.padding(top = 70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally){
+                Text(
+                    text = data.schoolName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    "Board - ${data.boardName}",
+                    style = MaterialTheme.typography.titleSmall, color = MainColor
+                )
+                Text(
+                    "Medium - ${data.medium}",
+                    style = MaterialTheme.typography.titleSmall, color = MainColor
+                )
+                Text(
+                    "Shift - ${data.shift}",
+                    style = MaterialTheme.typography.titleSmall, color = MainColor
+                )
+                Text(
+                    "(${data.timing})",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                }
+                Spacer(
+                    modifier = Modifier
+                        .height(10.dp)
+                        .fillMaxWidth()
+                        .background(LightMainColor)
+                )
+            }
+            Box(modifier = Modifier
+                .height(100.dp)
+                .width(100.dp)
+                .clip(CircleShape)
+                .constrainAs(profile){
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }) {
+                Image(rememberAsyncImagePainter(model = data.profile),"Profile",
+                contentScale = ContentScale.Fit)
+            }
+        }
+    }
+}
+@Composable
+fun SchoolDashboardLocation(loc : String) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+    shape = RoundedCornerShape(15.dp)
+    ) {
+        Column(modifier = Modifier.background(LightMainColor)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.medium)) {
+                Icon(
+                    Icons.Default.LocationOn, "", modifier = Modifier
+                        .weight(.20f)
+                        .height(40.dp)
+                        .width(40.dp),
+                    tint = MainColor
+                )
+                Text(text = loc, modifier = Modifier.weight(.8f))
+            }
+        }
+    }
+}
+@Composable
+fun SchoolDashboardContact(name: String, phone: Long, landline: String) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+        shape = RoundedCornerShape(15.dp)) {
+        Column(modifier = Modifier.background(LightMainColor)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painterResource(id = R.drawable.ic_contact_support), "", modifier = Modifier
+                        .weight(.20f)
+                        .height(40.dp)
+                        .width(40.dp),
+                    tint = MainColor
+                )
+                Column(modifier = Modifier.weight(.8f)) {
+                    Text(text = name)
+                    Text(text = "Phone - $phone")
+                    Text(text = "Landline - $landline")
+                }
+            }
+        }
+    }
+}
+@Composable
+fun SchoolDashboardMail(mail : String) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+        shape = RoundedCornerShape(15.dp)) {
+        Column(modifier = Modifier.background(LightMainColor)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.Email, "", modifier = Modifier
+                        .weight(.20f)
+                        .height(40.dp)
+                        .width(40.dp),
+                    tint = MainColor
+                )
+                Text(text = mail, modifier = Modifier.weight(.8f))
+            }
+        }
+    }
+}
+@Composable
+fun SchoolDashboardWebsite(web : String) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+        shape = RoundedCornerShape(15.dp)) {
+        Column(modifier = Modifier.background(LightMainColor)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.medium)) {
+                Icon(
+                    painterResource(id = R.drawable.ic_touch_app_blue_34), "", modifier = Modifier
+                        .weight(.20f)
+                        .height(40.dp)
+                        .width(40.dp),
+                    tint = MainColor
+                )
+                Text(text = web, modifier = Modifier.weight(.8f))
+            }
+        }
+    }
+}
+@Composable
+fun SchoolDashboardFeatures(data: SchoolPerksData) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .border(.5.dp, Gray, RoundedCornerShape(15.dp))
+            .background(White),) {
+            Spacer(modifier = Modifier
+                .height(20.dp)
+                .background(LightMainColor)
+                .fillMaxWidth())
+            Spacer(modifier = Modifier
+                .height(5.dp)
+                .fillMaxWidth())
+            Spacer(modifier = Modifier.height(5.dp))
+            Column(modifier = Modifier.padding(start = MaterialTheme.spacing.medium)) {
+                Text(
+                    "Transport : ${data.transport}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    "Hostel : ${data.hostel}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    "Canteen : ${data.canteen}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    "Smart Class : ${data.smartClass}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    "Dress Code : ${data.dressCode}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
+            Spacer(modifier = Modifier
+                .height(10.dp)
+                .fillMaxWidth()
+                .background(LightMainColor))
+        }
+    }
+}
+data class SchoolPerksData(
+    val transport:String,
+    val hostel :String,
+    val canteen :String,
+    val smartClass : String,
+    val dressCode: String
+)

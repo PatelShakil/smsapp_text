@@ -1,0 +1,366 @@
+//**IMP** replace AddExpensePopupScreen() fun with below one 
+
+fun AddExpensePopupScreen(
+    isEdit: Boolean = false,
+    expense: LedgerRecordItem? = LedgerRecordItem(),
+    headList: ArrayList<LedgerHeadItem>,
+    onDismiss: () -> Unit,
+    onConfirm: (LedgerRecordItem) -> Unit
+) {
+    var isBtnEnabled by remember { mutableStateOf(false) }
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 20.dp)
+                .background(Color.Transparent)
+                .clickable {
+                    onDismiss()
+                },
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(modifier = Modifier.fillMaxWidth(.95f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .clickable {
+
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(25.dp)
+                            .background(Color.White),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Divider(
+                            modifier = Modifier
+                                .height(6.dp)
+                                .width(50.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = MainColor
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        "${if (isEdit) "Update" else "Add"} Expense",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 30.dp)
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth(.95f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        SampleTextFieldDouble(
+                            label = "Amount",
+                            text = expense?.amount ?: 0.0,
+                            icon = R.drawable.ic_rupee_blue,
+                            onAmountSet = {
+                                expense?.amount = it
+                                isBtnEnabled =
+                                    expense?.amount != null && expense?.ledgerheadname != "" && expense?.ledgertypename != "" && expense?.remarks != ""
+                            })
+                        Spacer(modifier = Modifier.height(5.dp))
+                        DropDownCategory(
+                            label = "Head",
+                            selectedItem = DropDownItemData(
+                                expense?.ledgerheadid.toString() ?: "",
+                                expense?.ledgerheadname ?: ""
+                            ),
+                            list = headList.map {
+                                DropDownItemData(
+                                    it.id.toString(),
+                                    it.ledgername
+                                )
+                            },
+                            onSelect = {
+                                expense?.ledgerheadid = it.id.toInt()
+                                expense?.ledgerheadname = it.text
+                                isBtnEnabled =
+                                    expense?.amount != null && expense?.ledgerheadname != "" && expense?.ledgertypename != "" && expense?.remarks != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        DropDownCategory(
+                            label = "Entry Type",
+                            selectedItem = DropDownItemData(
+                                expense?.ledgertypeid.toString() ?: "",
+                                expense?.ledgertypename ?: ""
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Income"),
+                                DropDownItemData("2", "Expense")
+                            ),
+                            onSelect = {
+                                expense?.ledgertypeid = it.id.toInt()
+                                expense?.ledgertypename = it.text
+                                isBtnEnabled =
+                                    expense?.amount != null && expense?.ledgerheadname != "" && expense?.ledgertypename != "" && expense?.remarks != ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = expense?.receiptno ?: "",
+                            icon = R.drawable.ic_calender_dashboard,
+                            label = "Receipt No.",
+                            onTextChanged = {
+                                expense?.receiptno = it
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = expense?.remarks ?: "",
+                            icon = R.drawable.ic_assignment_dashboard,
+                            label = "Remarks",
+                            onTextChanged = {
+                                expense?.remarks = it
+                                isBtnEnabled =
+                                    expense?.amount != null && expense?.ledgerheadname != "" && expense?.ledgertypename != "" && expense?.remarks != ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Button(modifier = Modifier
+                            .fillMaxWidth(.9f),
+                            enabled = isBtnEnabled,
+                            onClick = {
+                                expense?.recorddate = LocalDateTime.now()
+                                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+                                onConfirm(expense!!)
+                                onDismiss()
+                            }) {
+                            Text(if (isEdit) "Update" else "Add")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+
+//replace ExpenseScreen() fun with below one
+
+@Composable
+fun ExpenseScreen(viewModel: HomeViewModel) {
+    var isDeleteExpenseRecordClicked by remember { mutableStateOf(false) }
+    var recordId by remember { mutableStateOf(0) }
+    var isAddExpense by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = "") {
+        viewModel.getLedgerHeadList()
+    }
+    val headList = viewModel.ledgerHeadList.collectAsState().value.let { data ->
+        when (data) {
+            is Resource.Success -> {
+                data.result
+            }
+
+            else -> {
+                ArrayList<LedgerHeadItem>()
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            TopHeaderLedgerRecord(headList) {
+                if (it.id == 0)
+                    viewModel.getExpenseList()
+                else
+                    viewModel.getExpenseList(it.id)
+
+            }
+
+            viewModel.expenseList.collectAsState().value.let {
+                when (it) {
+                    is Resource.Failure -> {
+                        if (it.errorMsgBody.contains("204"))
+                            onAPIFailed("No data for LedgerHead ", false)
+                        else
+                            onAPIFailed("Ledger Head Info (${it.errorCodeDescription}-${it.errorCode})")
+                    }
+
+                    is Resource.Loading -> {
+                        FullScreenProgressbar()
+                    }
+
+                    is Resource.Success -> {
+                        if (it.result.isEmpty()) {
+                            //Need to Handle Empty Screen
+                        } else {
+                            LaunchedEffect(key1 = "") {
+                                viewModel.getLedgerHeadList()
+                            }
+                            ExpenseMainScreen(it.result,
+                                viewModel.ledgerHeadList.collectAsState().value.let { data ->
+                                    when (data) {
+                                        is Resource.Success -> {
+                                            data.result
+                                        }
+
+                                        else -> {
+                                            ArrayList<LedgerHeadItem>()
+                                        }
+                                    }
+                                },
+                                onUpdateExpenseRecord = { headItem ->
+                                    //updation of expense
+                                    viewModel.updateExpense(headItem)
+                                },
+                                onDeleteExpenseRecord = { id ->
+                                    isDeleteExpenseRecordClicked = true
+                                    recordId = id
+                                }
+                            )
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+            if (isDeleteExpenseRecordClicked) {
+                //Show Delete Confirmation Dialog
+                Dialog(
+                    onDismissRequest = {
+                        isDeleteExpenseRecordClicked = false
+                    },
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(.95f)
+                            .padding(10.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 15.dp, horizontal = 20.dp)
+                        ) {
+                            Text(
+                                "Are you sure want to delete?",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 20.dp),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(onClick = {
+                                    isDeleteExpenseRecordClicked = false
+                                }) {
+                                    Text("No")
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Button(
+                                    onClick = {
+                                        viewModel.deleteExpense(recordId)
+                                        isDeleteExpenseRecordClicked = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red
+                                    )
+                                ) {
+                                    Text("Yes")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        FloatingActionButton(
+            onClick = {
+                isAddExpense = !isAddExpense
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(30.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add, "",
+                tint = MainColor
+            )
+        }
+        if (isAddExpense) {
+            AddExpensePopupScreen(headList = headList, onDismiss = {
+                isAddExpense = !isAddExpense
+            }, onConfirm = { headItem ->
+                //creation of ledger expense
+                viewModel.createExpense(headItem)
+            })
+        }
+    }
+}
+
+
+//replace ExpenseMainScreen() fun with below one
+
+fun ExpenseMainScreen(
+    result: ArrayList<LedgerRecordItem>,
+    headList: ArrayList<LedgerHeadItem>,
+    onUpdateExpenseRecord: (LedgerRecordItem) -> Unit,
+    onDeleteExpenseRecord: (Int) -> Unit
+) {
+    var selectedExpense by remember { mutableStateOf(LedgerRecordItem()) }
+    var isExpenseEditClicked by remember { mutableStateOf(false) }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val totalCount = result.sumOf { it.amount }.toInt()
+        val incomeCount = result.filter { it.ledgertypeid == 1 }.sumOf { it.amount }.toInt()
+        val expenseCount = result.filter { it.ledgertypeid == 2 }.sumOf { it.amount }.toInt()
+        item {
+            Spacer(modifier = Modifier.height(5.dp))
+            HeaderLedgerRecordInfo(
+                totalCount, incomeCount, expenseCount
+            )
+        }
+        items(result) {
+            Spacer(modifier = Modifier.height(5.dp))
+            ExpenseRecordSampleItem(
+                data = it,
+                onExpenseEditClicked = {
+                    isExpenseEditClicked = true
+                    selectedExpense = it
+                },
+                onExpenseDeleteClicked = { id ->
+                    onDeleteExpenseRecord(id)
+                })
+        }
+    }
+    if (isExpenseEditClicked) {
+        AddExpensePopupScreen(true, selectedExpense,
+            headList = headList,
+            onDismiss = {
+                isExpenseEditClicked = false
+            }, onConfirm = {
+                onUpdateExpenseRecord(it)
+            })
+    }
+}

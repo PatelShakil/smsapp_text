@@ -1,0 +1,56 @@
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.mycampus.smsapp.data.models.student.search.StudentSearchInfoItem
+import com.mycampus.smsapp.ui.main.adminhome.student.StudentInfoCard
+import com.mycampus.smsapp.ui.main.adminhome.student.StudentTopLegendCard
+
+@Composable
+fun StudentSearchCardGroup(studentList: ArrayList<StudentSearchInfoItem>, navController: NavController) {
+    LazyColumn(
+        modifier = Modifier.padding(bottom = 48.dp)
+    ) {
+        item {
+            var totalCount=studentList.size
+            var maleCount=studentList.filter { it.gender.uppercase()=="MALE" }.size
+            var femaleCount=studentList.filter { it.gender.uppercase()=="FEMALE" }.size
+            //StudentTopLegendCard(totalCount,maleCount,femaleCount)
+        }
+        items(studentList) { student ->
+            StudentInfoCard(
+                admissionType=student.admissiontypename,
+                studentDBuid=student.webappid,
+                classid = student.classid,
+                classname = student.classname,
+                sectionid = student.sectionid,
+                sectionName = student.sectionname,
+                name=student.searchdata,
+                fathername=student.fathername,
+                schoolAdmissionNo = student.admissionno,
+                contactNo=student.mobile,
+                gender=student.gender,
+                imageURL=student.picurl,
+                navController = navController,
+                ews = student.ews,
+                rte = student.rte,
+                pwd=student.pwd,
+                staffward = student.staffward,
+                singlegirlchild = student.singlegirlchild,
+                rollNo =student.studentrollno ,
+                feeAccountNo = student.Offlinefeebookaccountno ,
+                onClick = {
+                    //viewModel.setCurrentFee(item)
+                    //navController.navigate(StudentAppScreen.Fee.FeeDetails.route)
+                })
+
+
+        
+        }
+        //item { Spacer(modifier = Modifier.padding(55.dp)) }
+    }
+}

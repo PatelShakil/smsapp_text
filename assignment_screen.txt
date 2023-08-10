@@ -1,0 +1,205 @@
+//entry point
+AssignmentCallingFunction(viewModel)
+
+
+//layout code
+
+@Composable
+fun AssignmentCallingFunction(viewModel: HomeViewModel) {
+    val assignmentsList=viewModel.assignmentsList.collectAsState()
+    assignmentsList.value?.let {
+        when (it){
+            is Resource.Failure -> {
+                if(it.errorMsgBody.contains("204"))
+                    onAPIFailed("No data for Assignments ",false)
+                else
+                    onAPIFailed("Assignments Info (${it.errorCodeDescription}-${it.errorCode})")
+            }
+            Resource.Loading -> {
+                FullScreenProgressbar()
+            }
+            is Resource.Success -> {
+                if (it.result.isEmpty()) {
+                    //Need to Handle Empty Screen
+                } else {
+                    AssignmentsMainScreen(it.result)
+                }
+            }
+        }
+    }
+}
+@Composable
+fun AssignmentsMainScreen(result: ArrayList<AssignmentsItem>) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        AssignmentTopCard()
+        Spacer(modifier = Modifier.height(5.dp))
+        LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+            items(result) {
+                AssignmentCardItem(it)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+@Composable
+fun AssignmentCardItem(data: AssignmentsItem) {
+    val colorBg = if(data.ispublished == true) Color(0xFFA4D7C0) else Color(0xFFFDD6D7)
+    val attachmentList = data.attachments
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+        border = BorderStroke(.5.dp, Color.Gray),
+        elevation = CardDefaults.cardElevation(30.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(modifier = Modifier.fillMaxWidth(.9f)) {
+                Row(
+                    modifier = Modifier
+                        .background(colorBg)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text("Assignment for ${data.subjectname}", modifier = Modifier.padding(horizontal = 10.dp),
+                        style = MaterialTheme.typography.titleSmall)
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth(.96f), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier
+                    .weight(.6f)) {
+                    AsCardItemRow(key = "Title", value = data.title!!)
+                    AsCardItemRow(key = "Subject", value = data.subjectname!!)
+                    AsCardItemRow(key = "Teacher", value = data.subjectteachername!!)
+                    AsCardItemRow(key = "Assigned On", value = data.assignmentdate!!.replace("T"," "))
+                    AsCardItemRow(key = "Due On", value = data.assignmentdueon!!.replace("T"," "))
+                }
+                Box(modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(colorBg),
+                    contentAlignment = Center){
+                    Icon(painterResource(id = R.drawable.ic_assignment), contentDescription = "",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(45.dp))
+                }
+                Spacer(modifier = Modifier.width(15.dp))
+            }
+            Text("Description : ",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier
+                    .align(Start)
+                    .padding(start = 8.dp))
+            Text(data.description!!,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .align(Start)
+                    .padding(start = 8.dp))
+            Text("Attachments :",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier
+                    .align(Start)
+                    .padding(start = 8.dp)
+            )
+            if(attachmentList.isNullOrEmpty()){
+                Text("No attachments available!",
+                    style = MaterialTheme.typography.bodySmall,)
+            }else {
+                attachmentList?.forEachIndexed { index, p ->
+                    AttachmentItem(index+1, p, onDelete = {
+                        //Delete click
+
+                    })
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.width(5.dp))
+                Icon(painterResource(id = R.drawable.ic_calender_dashboard), contentDescription = "",
+                    tint = MainColor)
+                Text(data.creationdate!!.replace("T"," "),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .weight(.8f)
+                        .padding(top = 4.dp))
+                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            //Menu click
+
+                        }
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+}
+@Composable
+fun AttachmentItem(index : Int,data:Attachment,onDelete : (Attachment) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("$index . ${data.name}",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Blue,
+            modifier = Modifier.weight(.9f))
+        Icon(
+            modifier = Modifier
+//                .weight(.1f)
+                .clickable {
+                    onDelete(data)
+                },
+            imageVector = Icons.Default.Delete,
+            contentDescription = ""
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+    }
+}
+@Composable
+fun AsCardItemRow(key : String,value : String ) {
+    Row(modifier = Modifier.fillMaxWidth(.95f)) {
+        Text(text = "$key : ",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Black)
+        Text(text = value,
+            style = MaterialTheme.typography.bodySmall)
+    }
+}
+@Composable
+fun AssignmentTopCard() {
+    val spacing = MaterialTheme.spacing
+    val colorBg = Color(0xFFFEFEFE)
+    androidx.compose.material.Card(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.background(colorBg)) {
+            val (cardNameText,cardImage) = createRefs()
+            androidx.compose.material.Text(text = "Assignments",
+                modifier = Modifier
+                    .padding(start = spacing.medium, top = spacing.medium / 2)
+                    .constrainAs(cardNameText) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.5f)
+                    .background(colorBg),
+                style = MaterialTheme.typography.titleMedium,
+                color = MainColor,
+                fontSize = 19.sp,
+                softWrap = true)
+            Image(painterResource(id = R.drawable.assignment_related), contentDescription = "noticeboard",
+                modifier = Modifier
+                    .constrainAs(cardImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .height(120.dp)
+                    .width(150.dp),
+                contentScale = ContentScale.FillBounds)
+        }
+    }
+}

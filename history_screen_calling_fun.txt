@@ -1,0 +1,49 @@
+//main calling HomeScreen
+
+
+    AppTheme {
+        Column(modifier = Modifier.fillMaxSize()) {
+            var isHistoryShown by remember { mutableStateOf(false) }
+            StudentFilterRow(onHistoryClicked = {
+                isHistoryShown = true
+            }) {
+                //on filter clicked
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            if (isHistoryShown) {
+                HistoryScreen(viewModel = hiltViewModel())
+            }
+
+        }
+    }
+
+//filter row 
+
+
+@Composable
+fun StudentFilterRow(onHistoryClicked: () -> Unit, onFilterClicked: () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(5.dp)
+                .clickable { onHistoryClicked() }
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_history), "",
+                tint = MainColor
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                "History",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(top = 3.dp)
+            )
+        }
+    }
+}
+
+
+
+//remaining stuff should be sent directly with .kt file
+

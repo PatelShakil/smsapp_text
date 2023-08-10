@@ -1,0 +1,101 @@
+//replace LedgerHeadScreen() fun with below function
+
+@Composable
+fun LedgerHeadScreen(viewModel: HomeViewModel) {
+    var isAddHead by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            TopHeaderLedgerHead()
+            viewModel.ledgerHeadList.collectAsState().value.let {
+                when (it) {
+                    is Resource.Failure -> {
+                        if (it.errorMsgBody.contains("204"))
+                            onAPIFailed("No data for LedgerHead ", false)
+                        else
+                            onAPIFailed("Ledger Head Info (${it.errorCodeDescription}-${it.errorCode})")
+                    }
+
+                    is Resource.Loading -> {
+                        FullScreenProgressbar()
+                    }
+
+                    is Resource.Success -> {
+                        if (it.result.isEmpty()) {
+                            //Need to Handle Empty Screen
+                        } else {
+                            LedgerHeadMainScreen(it.result,
+                                onUpdateLedgerHead = { headItem ->
+                                    //updation of ledger head
+                                    viewModel.updateLedgerHead(headItem)
+                                })
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+        FloatingActionButton(
+            onClick = {
+                isAddHead = !isAddHead
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(30.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add, "",
+                tint = MainColor
+            )
+        }
+        if (isAddHead) {
+            AddLedgerHeadPopupScreen(onDismiss = {
+                isAddHead = !isAddHead
+            }, onConfirm = {
+                viewModel.createLedgerHead(it)
+            })
+        }
+    }
+}
+
+
+//replace LedgerHeadMainScreen() fun with below function
+
+@Composable
+fun LedgerHeadMainScreen(
+    result: ArrayList<LedgerHeadItem>,
+    onUpdateLedgerHead: (LedgerHeadItem) -> Unit
+) {
+    var selectedHead by remember { mutableStateOf(LedgerHeadItem()) }
+    var isLedgerEditClicked by remember { mutableStateOf(false) }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(result) {
+            Spacer(modifier = Modifier.height(5.dp))
+            LedgerHeadSampleItem(
+                data = LedgerHeadItem(
+                    it.id,
+                    it.ledgercode,
+                    it.ledgerdescription,
+                    it.ledgername,
+                    it.status
+                )
+            ) {
+                isLedgerEditClicked = true
+                selectedHead = it
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(100.dp))
+        }
+    }
+    if (isLedgerEditClicked) {
+        AddLedgerHeadPopupScreen(true, selectedHead, onDismiss = {
+            isLedgerEditClicked = false
+        }, onConfirm = {
+            onUpdateLedgerHead(it)
+        })
+    }
+}

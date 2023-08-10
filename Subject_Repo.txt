@@ -1,0 +1,135 @@
+//repo interface
+
+package com.mycampus.smsapp.data.repo.subjects
+
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.adminsettings.subject.SubjectInfoItem
+
+interface Subject {
+    suspend fun getSubjects(subjectid: String?): Resource<ArrayList<SubjectInfoItem>>?
+    suspend fun createSubject(subject: List<SubjectInfoItem>): Resource<Boolean>
+    suspend fun updateSubject(subject: List<SubjectInfoItem>): Resource<Boolean>
+}
+
+
+//repo implementation
+
+package com.mycampus.smsapp.data.repo.subjects
+
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.adminsettings.subject.SubjectInfoItem
+import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
+import io.ktor.client.features.ResponseException
+import io.ktor.client.features.ServerResponseException
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.url
+import io.ktor.client.statement.readText
+import javax.inject.Inject
+
+class SubjectImpl @Inject constructor(
+    private val httpClient: HttpClient
+) : Subject {
+    
+    override suspend fun getSubjects(subjectid: String?): Resource<ArrayList<SubjectInfoItem>> {
+        return try {
+            Resource.Success(
+                httpClient.get<ArrayList<SubjectInfoItem>> {
+                    url("http://devapi.mycampus.co.in/api/v1/Admin/subject")
+                    parameter("subjectid", subjectid)
+                    header("MODI", "3LWBgoDbDDS4nZOBmb3EI4RDknn8MaH3KJPVJnL5C5KldBY3O6tW4N3bNZRP")
+                })
+        } catch (e: ResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ClientRequestException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ServerResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: Exception) {
+            Resource.Failure(
+                errorMsgBody = e.message.toString()
+            )
+        }
+    }
+
+    override suspend fun createSubject(subject: List<SubjectInfoItem>): Resource<Boolean> {
+        return try {
+            Resource.Success(
+                httpClient.post<Boolean> {
+                    url("http://devapi.mycampus.co.in/api/v1/Admin/subject")
+                    header("MODI", "3LWBgoDbDDS4nZOBmb3EI4RDknn8MaH3KJPVJnL5C5KldBY3O6tW4N3bNZRP")
+                    body = subject
+                })
+        } catch (e: ResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ClientRequestException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ServerResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: Exception) {
+            Resource.Failure(
+                errorMsgBody = e.message.toString()
+            )
+        }
+    }
+
+    override suspend fun updateSubject(subject: List<SubjectInfoItem>): Resource<Boolean> {
+        return try {
+            Resource.Success(
+                httpClient.post<Boolean> {
+                    url("http://devapi.mycampus.co.in/api/v1/Admin/updatesubject")
+                    header("MODI", "3LWBgoDbDDS4nZOBmb3EI4RDknn8MaH3KJPVJnL5C5KldBY3O6tW4N3bNZRP")
+                    body = subject
+                })
+        } catch (e: ResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ClientRequestException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: ServerResponseException) {
+            Resource.Failure(
+                errorCode = e.response.status.value,
+                errorCodeDescription = e.response.status.description,
+                errorMsgBody = e.response.readText()
+            )
+        } catch (e: Exception) {
+            Resource.Failure(
+                errorMsgBody = e.message.toString()
+            )
+        }
+    }
+}

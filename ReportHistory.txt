@@ -1,0 +1,8 @@
+package com.mycampus.smsapp.data.repo.reportfilter
+
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.reportfilter.ReportHistoryItem
+
+interface ReportHistory {
+    suspend fun getReportHistoryList(): Resource<ArrayList<ReportHistoryItem>>
+}
