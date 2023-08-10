@@ -1,0 +1,221 @@
+package com.mycampus.smsapp.ui.main.studenthome.screens.reporthistory
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.mycampus.smsapp.R
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.reportfilter.ReportHistoryItem
+import com.mycampus.smsapp.ui.common.FullScreenProgressbar
+import com.mycampus.smsapp.ui.common.onAPIFailed
+import com.mycampus.smsapp.ui.theme.AppTheme
+import com.mycampus.smsapp.ui.theme.MainColor
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+@Composable
+fun HistoryScreen(viewModel: HistoryViewModel) {
+    AppTheme {
+        Column {
+            viewModel.reportHistoryList.collectAsState().value.let {
+                when (it) {
+                    is Resource.Failure -> {
+                        if (it.errorMsgBody.contains("204")) onAPIFailed(
+                            "No data for Report History ",
+                            false
+                        )
+                        else onAPIFailed("Report History Info (${it.errorCodeDescription}-${it.errorCode})")
+                    }
+
+                    is Resource.Loading -> {
+                        FullScreenProgressbar()
+                    }
+
+                    is Resource.Success -> {
+                        HistoryMainScreen(data = it.result)
+                    }
+
+                    else -> {}
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun HistoryMainScreen(data: List<ReportHistoryItem>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(data) {
+            Spacer(modifier = Modifier.height(5.dp))
+            ReportHistoryItemCard(data = it)
+        }
+        item {
+            Spacer(modifier = Modifier.height(100.dp))
+        }
+    }
+}
+
+@Composable
+fun ReportHistoryItemCard(data: ReportHistoryItem) {
+    Card(
+        modifier = Modifier.fillMaxWidth(.95f),
+        elevation = CardDefaults.cardElevation(30.dp),
+        border = BorderStroke(.5.dp, Color.Gray)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val bgColor = if (data.status == 3 && data.reporturl != null) Color(0xFFD0E2F5)
+            else Color(0xFFFED8D5)
+
+            Column(Modifier.weight(.7f)) {
+                Text(
+                    data.reportname,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Black,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+//                            .border(.5.dp, Color.Gray, CircleShape)
+                        , contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painterResource(id = if (data.reportformat == "PDF") R.drawable.ic_pdf else if (data.reportformat == "WORD") R.drawable.ic_word else R.drawable.ic_excel),
+                            "",
+                            modifier = Modifier.size(17.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        data.reportformat + " Report", fontSize = 12.sp
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+//                            .border(.5.dp, Color.Gray, CircleShape)
+                        , contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painterResource(id = if (data.statustext == "In Progress") R.drawable.refresh_icon else if (data.statustext == "InQueue") R.drawable.sms_queue_icon else R.drawable.ic_fee_report_blue),
+                            "",
+                            modifier = Modifier.size(17.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        data.statustext, fontSize = 12.sp
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+//                            .border(.5.dp, Color.Gray, CircleShape)
+                        , contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_calender_dashboard),
+                            contentDescription = "",
+                            tint = MainColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        getFormattedDate(data.creationdate, "dd-MMM-yyyy hh:mm a"),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 3.dp),
+                        fontSize = 12.sp
+                    )
+                }
+                val depList = data.dependentfield
+                Row {
+
+                    if (depList.size > 1) {
+                        Text(
+                            "*** ", fontSize = 10.sp
+                        )
+                        depList.forEachIndexed { index, it ->
+                            Text(
+                                it.defaultvalue + if (index != depList.size - 1) " - " else "",
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.width(15.dp))
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(50.dp)
+                    .border(.5.dp, bgColor, CircleShape)
+                    .background(bgColor)
+                    .clickable {
+
+                    }, contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = if (data.status == 3 && data.reporturl != null) R.drawable.ic_download
+                        else R.drawable.refresh_icon
+                    ), contentDescription = "", tint = Color.White, modifier = Modifier.size(40.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(5.dp))
+
+        }
+    }
+}
+
+fun getFormattedDate(apiDate: String, format: String): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+    val date = LocalDateTime.parse(apiDate, formatter)
+    return date.format(DateTimeFormatter.ofPattern(format))
+}

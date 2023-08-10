@@ -1,0 +1,149 @@
+@Composable
+fun MainScreenFeeCategory() {
+    val spacing = MaterialTheme.spacing
+    val name = remember{ mutableStateOf("") }
+    val code = remember{ mutableStateOf("") }
+    val desc = remember{ mutableStateOf("") }
+    val status = remember{ mutableStateOf("") }
+    val categoryData = FeeCategoryData("","","","")
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val isAddClick = remember{ mutableStateOf(false) }
+        val (fab)  = createRefs()
+        FloatingActionButton(onClick = {
+            isAddClick.value = true
+        },
+        modifier = Modifier
+            .constrainAs(fab) {
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+            }
+            .padding(end = spacing.medium, bottom = spacing.medium)) {
+            Icon(imageVector = Icons.Default.Add,"")
+            
+        }
+        if(isAddClick.value){
+            AddFeeCategoryPopup(onDismiss = { isAddClick.value = false }, onConfirm = {
+                name.value = it.name
+                code.value = it.code
+                desc.value = it.desc
+                status.value = it.status
+                Log.d("THis",it.toString())
+            })
+        }
+    }
+}
+data class FeeCategoryData(
+    val name :String,
+    val code:String,
+    val desc :String,
+    val status : String
+)
+
+@Composable
+fun AddFeeCategoryPopup(
+    onDismiss:()-> Unit,
+    onConfirm:(FeeCategoryData)->Unit
+) {
+    val spacing = MaterialTheme.spacing
+    val name = remember{ mutableStateOf("") }
+    val code = remember{ mutableStateOf("") }
+    val desc = remember{ mutableStateOf("") }
+    val status = remember{ mutableStateOf("") }
+    val checkState1 = remember{ mutableStateOf(false) }
+    Dialog(onDismissRequest = { onDismiss() },
+    properties = DialogProperties(
+        usePlatformDefaultWidth = false
+    )
+    ) {
+        Card(modifier = Modifier.fillMaxWidth(.9f)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(White),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center) {
+                    Icon(painterResource(id = R.drawable.ic_fee),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .padding(top = spacing.medium / 2)
+                            .height(30.dp)
+                            .width(30.dp),
+                        tint = MainColor
+                    )
+                    androidx.compose.material.Text(
+                        "Add Fee Category",
+                        modifier = Modifier
+                            .padding(
+                                bottom = spacing.medium / 2,
+                                start = 3.dp,
+                                top = (spacing.medium / 2) + 3.dp
+                            ),
+                        fontWeight = FontWeight.Normal,
+                    )
+                }
+                androidx.compose.material3.Divider(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth(), color = Color.Black
+                )
+                Spacer(modifier = Modifier.width(spacing.medium / 2))
+                TextField(modifier = Modifier
+                    .fillMaxWidth(.95f)
+                    .padding(top = spacing.medium / 2),
+                    value = name.value,
+                    onValueChange = { name.value = it },
+                placeholder = {Text("Enter Category Name")},
+                label = {Text("Name")},
+                colors = androidx.compose.material.TextFieldDefaults.textFieldColors(backgroundColor = White))
+
+                Spacer(modifier = Modifier.width(spacing.medium / 2))
+                TextField(modifier = Modifier.fillMaxWidth(.95f)
+                    .padding(top = spacing.medium / 2),
+                    value = code.value,
+                    onValueChange = { code.value = it },
+                placeholder = {Text("Enter Category Code")},
+                    colors = androidx.compose.material.TextFieldDefaults.textFieldColors(backgroundColor = White),
+                label = {Text("Code")})
+
+                Spacer(modifier = Modifier.width(spacing.medium / 2))
+                TextField(modifier = Modifier.fillMaxWidth(.95f)
+                    .padding(top = spacing.medium / 2),
+                    value = desc.value,
+                    onValueChange = { desc.value = it },
+                placeholder = {Text("Enter Category Description")},
+                label = {Text("Description")},
+                    colors = androidx.compose.material.TextFieldDefaults.textFieldColors(backgroundColor = White))
+
+                Spacer(modifier = Modifier.width(spacing.medium/2))
+
+                Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.clickable {
+                    checkState1.value = !checkState1.value
+                }) {
+                    Checkbox(
+                        checked = checkState1.value,
+                        onCheckedChange = { checkState1.value = !checkState1.value })
+                    Text(text = "Active")
+                }
+
+                Button(onClick = {
+                    if(checkState1.value) {
+                        onConfirm(FeeCategoryData(name.value, code.value, desc.value, "Active"))
+                    }else{
+                        onConfirm(FeeCategoryData(name.value, code.value, desc.value, ""))
+                    }
+                                 onDismiss()},
+                modifier = Modifier
+                    .fillMaxWidth(.9f)
+                    .padding(top = spacing.medium / 2,bottom = spacing.medium / 2),
+                shape = RoundedCornerShape(20.dp)
+                ) {
+                    androidx.compose.material3.Text("Add Category")
+
+                }
+            }
+        }
+    }
+
+}

@@ -1,0 +1,32 @@
+package com.mycampus.smsapp.ui.main.studenthome.screens.reporthistory
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.reportfilter.ReportHistoryItem
+import com.mycampus.smsapp.data.repo.reportfilter.ReportHistory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
+    val repo: ReportHistory
+) : ViewModel() {
+
+    private val _reportHistoryList = MutableStateFlow<Resource<ArrayList<ReportHistoryItem>>?>(null)
+    val reportHistoryList: MutableStateFlow<Resource<ArrayList<ReportHistoryItem>>?>
+        get() = _reportHistoryList
+
+    init {
+        getReportHistoryList()
+    }
+
+    private fun getReportHistoryList() = viewModelScope.launch {
+        _reportHistoryList.value = Resource.Loading
+        _reportHistoryList.value = repo.getReportHistoryList()
+    }
+
+
+}

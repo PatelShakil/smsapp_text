@@ -1,0 +1,938 @@
+
+import android.app.DatePickerDialog
+import android.os.Build
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.mycampus.smsapp.R
+import com.mycampus.smsapp.ui.theme.AppTheme
+import com.mycampus.smsapp.ui.theme.LightMainColor
+import com.mycampus.smsapp.ui.theme.MainColor
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Composable
+fun ActivityScreen(navController: NavController) {
+    val viewModel = StudentProfileEditViewModel()
+    AppTheme{
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(ScrollState(0), true), horizontalAlignment = Alignment.CenterHorizontally) {
+            StudentProfileSection()
+            Spacer(modifier = Modifier.height(5.dp))
+            StudentMobileEmailScreen(viewModel)
+            Spacer(modifier = Modifier.height(5.dp))
+            StudentPersonalInfoScreen(viewModel)
+        }
+    }
+}
+@Serializable
+data class StudentdetailsVar(
+    @SerialName("aadharno")
+    var aadharno: String,
+    @SerialName("admissiondate")
+    var admissiondate: String,
+    @SerialName("admissionid")
+    var admissionid: String,
+    @SerialName("admissionno")
+    var admissionno: String,
+    @SerialName("birthplace")
+    var birthplace: String,
+    @SerialName("bloodgroup")
+    var bloodgroup: String,
+    @SerialName("bloodgroupid")
+    var bloodgroupid: String,
+    @SerialName("caste")
+    var caste: String,
+    @SerialName("casteid")
+    var casteid: String,
+    @SerialName("ccahouse")
+    var ccahouse: String,
+    @SerialName("ccahouseid")
+    var ccahouseid: String,
+    @SerialName("class")
+    var classname: String,
+    @SerialName("classid")
+    var classid: String,
+    @SerialName("community")
+    var community: String,
+    @SerialName("communityid")
+    var communityid: String,
+    @SerialName("dob")
+    var dob: String,
+    @SerialName("email")
+    var email: String,
+    @SerialName("emailverified")
+    var emailverified: Boolean,
+    @SerialName("ews")
+    var ews: Boolean,
+    @SerialName("firstname")
+    var firstname: String,
+    @SerialName("gender")
+    var gender: String,
+    @SerialName("genderid")
+    var genderid: String,
+    @SerialName("height")
+    var height: Double,
+    @SerialName("hobby")
+    var hobby: String,
+    @SerialName("lastname")
+    var lastname: String,
+    @SerialName("language")
+    var language: String,
+    @SerialName("languageid")
+    var languageid: String,
+    @SerialName("medicalhistory")
+    var medicalhistory: String,
+    @SerialName("middlename")
+    var middlename: String,
+    @SerialName("mobilenumber")
+    var mobilenumber: String,
+    @SerialName("mobilenumberverified")
+    var mobilenumberverified: Boolean,
+    @SerialName("mothertongue")
+    var mothertongue: String,
+    @SerialName("nationality")
+    var nationality: String,
+    @SerialName("nationalityid")
+    var nationalityid: String,
+    @SerialName("physicallychallenged")
+    var physicallychallenged: Boolean,
+    @SerialName("promotioncall")
+    var promotioncall: Boolean,
+    @SerialName("promotionemail")
+    var promotionemail: Boolean,
+    @SerialName("promotionsms")
+    var promotionsms: Boolean,
+    @SerialName("religion")
+    var religion: String,
+    @SerialName("religionid")
+    var religionid: String,
+    @SerialName("rollno")
+    var rollno: Int,
+    @SerialName("rtecategory")
+    var rtecategory: Boolean,
+    @SerialName("section")
+    var section: String,
+    @SerialName("sectionid")
+    var sectionid: String,
+    @SerialName("singlechild")
+    var singlechild: Boolean,
+    @SerialName("staff")
+    var staff: Boolean,
+    @SerialName("staffchild")
+    var staffchild: Boolean,
+    @SerialName("title")
+    var title: String,
+    @SerialName("titleid")
+    var titleid: String,
+    @SerialName("webappid")
+    var webappid: String,
+    @SerialName("weight")
+    var weight: Double,
+)
+data class DropDownItemData(
+    val id:String,
+    val text:String
+)
+fun getDropDownItemData():List<DropDownItemData>{
+    return mutableListOf(
+        DropDownItemData("1","Indian"),
+        DropDownItemData("2","Chinese"),
+        DropDownItemData("3","American"),
+        DropDownItemData("4","African"),
+    )
+}
+@Composable
+fun StudentProfileSection() {
+
+}
+@Composable
+fun StudentMobileEmailScreen(viewModel: StudentProfileEditViewModel) {
+    val stud : StudentdetailsVar? = null
+    Column(modifier = Modifier
+        .fillMaxWidth(.95f)) {
+
+    val isEditable = remember {
+        mutableStateOf(false)
+    }
+        Card(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .border(
+                .5.dp, Gray,
+                RoundedCornerShape(15.dp)
+            )) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(White)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(25.dp)
+                    .background(LightMainColor),
+                horizontalArrangement = Arrangement.Center){
+                    Text("Mobile and Email",style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+                }
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth(.7f)
+                        .padding(start = 10.dp)) {
+                        if (isEditable.value) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            SampleTextField(
+                                label = "Phone No.",
+                                text = viewModel.student.mobilenumber,
+                                onTextChanged = { viewModel.student.mobilenumber = it })
+                        }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                SampleTextField(
+                                    label = "Email",
+                                    text = viewModel.student.email,
+                                    onTextChanged = { viewModel.student.email = it })
+                            }
+
+                        }
+                        else {
+                            Row {
+                                Column() {
+                                    LabelField(label = "Phone No.", value = viewModel.student.mobilenumber)
+                                    LabelField(
+                                        label = viewModel.student.email,
+                                        value = viewModel.student.mobilenumber
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                        .clip(CircleShape)
+                        .height(70.dp)
+                        .width(70.dp)
+                        .background(LightMainColor, CircleShape)){
+                        Icon(painterResource(id = R.drawable.contact_mail_ic),"",
+                        tint = MainColor,
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(40.dp)
+                            .align(Alignment.Center)
+                            )
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Column (modifier = Modifier.fillMaxWidth()){
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(5.dp)
+                        .background(LightMainColor))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(LightMainColor)
+                            .padding(horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (isEditable.value) {
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = false
+                                }) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Close, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Cancel",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = false
+                                }) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Check, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Update",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+                            }
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Settings, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Manage",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(start = 3.dp ,top = 4.dp)
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = true
+                                }) {
+
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Edit, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                        "Edit",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
+    }
+    }
+}
+@Composable
+fun StudentPersonalInfoScreen(viewModel: StudentProfileEditViewModel) {
+    val stud : StudentdetailsVar? = null
+    Column(modifier = Modifier
+        .fillMaxWidth(.95f)) {
+
+        val isEditable = remember {
+            mutableStateOf(false)
+        }
+        val isDatePickerHasFocus = remember{ mutableStateOf(false) }
+        val dobDate = remember{ mutableStateOf(viewModel.student.dob) }
+        Card(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .border(
+                .5.dp, Gray,
+                RoundedCornerShape(15.dp)
+            )) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(White)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(25.dp)
+                    .background(LightMainColor),
+                    horizontalArrangement = Arrangement.Center){
+                    Text("Personal Info",style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+                }
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp)
+//                        .verticalScroll(ScrollState(0), true)
+                    ) {
+                        if (isEditable.value) {
+                            Row {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(.7f)
+                                ) {
+                                    SampleTextField(
+                                        label = "First Name",
+                                        text = viewModel.student.firstname,
+                                        onTextChanged = { viewModel.student.firstname = it })
+                                    SampleTextField(
+                                        label = "Middle Name",
+                                        text = viewModel.student.middlename,
+                                        onTextChanged = { viewModel.student.middlename = it }
+                                    )
+                                    SampleTextField(
+                                        label = "Last Name",
+                                        text = viewModel.student.lastname,
+                                        onTextChanged = { viewModel.student.lastname = it })
+                                }
+                                Box(modifier = Modifier
+                                    .padding(start = 15.dp, top = 45.dp)
+                                    .clip(CircleShape)
+                                    .height(70.dp)
+                                    .width(70.dp)
+                                    .background(LightMainColor, CircleShape)){
+                                    Icon(painterResource(id = R.drawable.ic_account_circle_dashboard),"",
+                                        tint = MainColor,
+                                        modifier = Modifier
+                                            .height(40.dp)
+                                            .width(40.dp)
+                                            .align(Alignment.Center)
+                                    )
+                                }
+                            }
+                            Row {
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        DropDownString(
+                                            label = "Gender",
+                                            selectedItem = DropDownItemData(viewModel.student.genderid,viewModel.student.gender),
+                                            list = listOf(DropDownItemData("1","Male"),DropDownItemData("2", "Female")),
+                                            onSelect = { viewModel.student.gender = it.text
+                                                viewModel.student.genderid = it.id})
+                                    }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        DropDownString(
+                                            label = "Community",
+                                            selectedItem = DropDownItemData(viewModel.student.communityid,viewModel.student.community),
+                                            list = listOf(DropDownItemData("1","SC"),DropDownItemData("2", "ST"),
+                                                DropDownItemData("3","Minority")),
+                                            onSelect = { viewModel.student.community = it.text
+                                                viewModel.student.communityid = it.id})
+                                    }
+                                }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    TextField(value = dobDate.value,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        modifier = Modifier.onFocusChanged {
+                                            if (it.hasFocus) {
+                                                isDatePickerHasFocus.value = true
+                                            }
+                                        },
+                                        colors = TextFieldDefaults.textFieldColors(backgroundColor = White),
+                                        label = { Text(text = ("DOB")) })
+                                    if (isDatePickerHasFocus.value) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            val dp = DatePickerDialog(LocalContext.current)
+                                            dp.setOnDateSetListener{ _, d, m, y ->
+                                                viewModel.student.dob = "$d/$m/$y"
+                                                dobDate.value = viewModel.student.dob
+                                                isDatePickerHasFocus.value = false
+                                            }
+                                            dp.show()
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)){
+                                    DropDownString(label = "Religion",
+                                        selectedItem = DropDownItemData(viewModel.student.religionid,viewModel.student.religion),
+                                        list = listOf(DropDownItemData("1","Muslim"),DropDownItemData("2","Parsi"),DropDownItemData("3","Hindu")),
+                                        onSelect ={viewModel.student.religion = it.text
+                                        viewModel.student.religionid = it.id} )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)){
+                                    DropDownString(label = "Nationality",
+                                        selectedItem = DropDownItemData(viewModel.student.nationalityid,viewModel.student.nationality),
+                                        list = getDropDownItemData(), onSelect = {
+                                            viewModel.student.nationality = it.text
+                                            viewModel.student.nationalityid = it.id
+                                        })
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)){
+                                    DropDownString(
+                                        label = "BloodGroup",
+                                        selectedItem = DropDownItemData(viewModel.student.bloodgroupid,viewModel.student.bloodgroup),
+                                        list = listOf(DropDownItemData("1","A"),DropDownItemData("2", "B"),
+                                            DropDownItemData("3","O")),
+                                        onSelect = { viewModel.student.bloodgroup = it.text
+                                            viewModel.student.bloodgroupid = it.id})
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)){
+                                    SampleTextField(
+                                        label = "Aadhar no.",
+                                        text = viewModel.student.aadharno,
+                                        onTextChanged ={viewModel.student.aadharno = it}
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)){
+                                    DropDownString(
+                                        label = "Language",
+                                        selectedItem = DropDownItemData(viewModel.student.languageid,viewModel.student.language),
+                                        list = listOf(DropDownItemData("1","Hindi"),DropDownItemData("2", "English"),
+                                            DropDownItemData("3","Gujarati")),
+                                        onSelect = { viewModel.student.language = it.text
+                                            viewModel.student.languageid = it.id})
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    SampleTextFieldDouble(
+                                        label = "Weight(KG)",
+                                        text = viewModel.student.weight,
+                                        onAmountSet = {viewModel.student.weight = it}
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    SampleTextFieldDouble(
+                                        label = "Height(CM)",
+                                        text = viewModel.student.height,
+                                        onAmountSet = {viewModel.student.height = it}
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    SampleTextField(
+                                        label = "Birth Place",
+                                        text = viewModel.student.birthplace,
+                                        onTextChanged = {viewModel.student.birthplace = it}
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    SampleTextField(
+                                        label = "Hobby",
+                                        text = viewModel.student.hobby,
+                                        onTextChanged = {viewModel.student.hobby = it}
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)){
+                                    SampleCheckBox(label = "RTE Category", curState = viewModel.student.rtecategory, onCheckedChange ={viewModel.student.rtecategory = it} )
+
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)){
+                                    SampleCheckBox(label = "Staff", curState = viewModel.student.staff, onCheckedChange ={viewModel.student.staff = it} )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)){
+                                    SampleCheckBox(label = "EWS", curState = viewModel.student.ews, onCheckedChange ={viewModel.student.ews = it} )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)){
+                                    SampleCheckBox(label = "Differently able", curState = viewModel.student.physicallychallenged, onCheckedChange ={viewModel.student.physicallychallenged = it} )
+                                }
+                            }
+                        }
+                        else {
+                            Row {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth(.7f)
+                                        ) {
+                                            LabelField(
+                                                label = "First Name",
+                                                value = viewModel.student.firstname
+                                            )
+                                            LabelField(
+                                                label = "Middle Name",
+                                                value = viewModel.student.middlename
+                                            )
+                                            LabelField(
+                                                label = "Last Name",
+                                                value = viewModel.student.lastname
+                                            )
+                                        }
+                                        Box(modifier = Modifier
+                                            .padding(start = 15.dp, top = 45.dp)
+                                            .clip(CircleShape)
+                                            .height(70.dp)
+                                            .width(70.dp)
+                                            .background(LightMainColor, CircleShape)){
+                                            Icon(painterResource(id = R.drawable.ic_account_circle_dashboard),"",
+                                                tint = MainColor,
+                                                modifier = Modifier
+                                                    .height(40.dp)
+                                                    .width(40.dp)
+                                                    .align(Alignment.Center)
+                                            )
+                                        }
+                                    }
+                            Row {
+                                            Box(modifier = Modifier.weight(1f)) {
+                                                LabelField(
+                                                    label = "Gender",
+                                                    value = viewModel.student.gender
+                                                )
+                                            }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                            Box(modifier = Modifier.weight(1f)) {
+                                                LabelField(
+                                                    label = "Community",
+                                                    value = viewModel.student.community
+                                                )
+                                            }
+                                        }
+                            Row {
+                                            Box(modifier = Modifier.weight(1f)) {
+                                                LabelField(
+                                                    label = "DOB",
+                                                    value = viewModel.student.dob
+                                                )
+                                            }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                                LabelField(
+                                                    label = "Religion",
+                                                    value = viewModel.student.religion
+                                                )
+                                            }
+                                        }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Nationality",
+                                        value = viewModel.student.nationality
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "BloodGroup",
+                                        value = viewModel.student.bloodgroup
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Aadhar no.",
+                                        value = viewModel.student.aadharno
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Language",
+                                        value = viewModel.student.language
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Weight(KG)",
+                                        value = viewModel.student.weight.toString()
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Height(CM)",
+                                        value = viewModel.student.height.toString()
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Birth Place",
+                                        value = viewModel.student.birthplace
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Hobby",
+                                        value = viewModel.student.hobby
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "RTE Category",
+                                        value = if (viewModel.student.rtecategory) "Applicable" else "Not Applicable"
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Staff",
+                                        value = if (viewModel.student.staff) "Applicable" else "Not Applicable"
+                                    )
+                                }
+                            }
+                            Row {
+                                Box(modifier = Modifier.weight(1f)) {
+
+                                    LabelField(
+                                        label = "EWS",
+                                        value = if (viewModel.student.ews) "Applicable" else "Not Applicable"
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    LabelField(
+                                        label = "Differently able",
+                                        value = if (viewModel.student.physicallychallenged) "Applicable" else "Not Applicable"
+                                    )
+                                }
+                            }
+
+
+                        }
+                    }
+
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Column (modifier = Modifier.fillMaxWidth()){
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(5.dp)
+                        .background(LightMainColor))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(LightMainColor)
+                            .padding(horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (isEditable.value) {
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = false
+                                }) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Close, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Cancel",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = false
+                                }) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Check, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Update",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+                            }
+                        }
+                        else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Settings, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Manage",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(start = 3.dp ,top = 4.dp)
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                                .clickable {
+                                    isEditable.value = true
+                                }) {
+
+                                Box(modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        White
+                                    )) {
+                                    Icon(
+                                        Icons.Default.Edit, "",
+                                        tint = MainColor
+                                    )
+                                }
+                                Text(
+                                    "Edit",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.padding(top = 4.dp,start = 3.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun SampleCheckBox(label: String,curState: Boolean,onCheckedChange:(Boolean)-> Unit) {
+    val checkState1 = remember{mutableStateOf(curState)}
+    Row(verticalAlignment = Alignment.CenterVertically,) {
+        Checkbox(
+            checked = checkState1.value,
+            onCheckedChange = { checkState1.value = !checkState1.value
+                onCheckedChange(checkState1.value) })
+        Text(text = label)
+    }
+}
+@Composable
+fun SampleTextFieldDouble(label :String,text:Double,onAmountSet:(Double)-> Unit) {
+    val value = remember{ mutableStateOf(text) }
+    TextField(
+        value = if(value.value == 0.0) "" else value.value.toString(),
+        onValueChange = {
+            if (it.isEmpty()){
+                value.value = 0.0
+            } else {
+                value.value = when (it.toDoubleOrNull()) {
+                    null -> value.value //old value
+                    else -> it.toDouble()   //new value
+                }
+            }
+            onAmountSet(value.value)
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = White),
+        label ={Text(label)}
+    )
+}
+@Composable
+fun LabelField(label: String, value: String) {
+        TextField(value = value, readOnly = true, onValueChange = {},modifier = Modifier
+            .fillMaxWidth(),
+            label = {Text(label)},
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+        )
+}
+@Composable
+fun DropDownString(label : String,selectedItem : DropDownItemData, list: List<DropDownItemData>,onSelect:(DropDownItemData)->Unit) {
+    val expanded = remember { mutableStateOf(false) }
+    val selected = remember { mutableStateOf(selectedItem) }
+    val icon = if (expanded.value)
+        Icons.Default.KeyboardArrowUp //it requires androidx.compose.material:material-icons-extended
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row {
+        Column(modifier = Modifier
+            .weight(.7f)
+            .background(Color.White)) {
+            TextField(
+                value = selected.value.text,
+                readOnly = true,
+                onValueChange = {},
+                modifier = Modifier
+                    .clickable {
+                        expanded.value = !expanded.value
+                    }
+                    .fillMaxWidth(),
+//                placeholder = { Text(placeHolder) },
+                label = { Text(label) },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
+                },
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+            )
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+            ) {
+                list.forEach { label ->
+                    DropdownMenuItem(onClick = {
+                        selected.value = label
+                        expanded.value = false
+                        onSelect(label)
+                    },
+                        content =  { Text(label.text) }
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun SampleTextField(label : String,text : String ,onTextChanged :(String) -> Unit) {
+    val textFieldText = remember{ mutableStateOf(text) }
+   TextField(value = textFieldText.value, onValueChange = {
+        textFieldText.value = it
+        onTextChanged(it)},
+        label = {Text(label)},
+    modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+   )
+}

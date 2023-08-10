@@ -1,0 +1,553 @@
+@Composable
+fun StudentParentInfoScreen(viewModel: StudentProfileEditViewModel, navController: NavController) {
+    var studentsInfo=viewModel.studentAllInfo.collectAsState()
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(.95f)
+            .background(Color.White)
+            .border(
+                .5.dp, Gray,
+                RoundedCornerShape(15.dp)
+            )
+    ) {
+        val isEditable = remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(White)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(25.dp)
+                    .background(LightMainColor),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Parents Info",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleSmall
+                )
+            }
+            if (isEditable.value) {
+                Row {
+                    Box(modifier = Modifier.weight(1f)){
+                        SampleTextField(
+                            label = "Father Name",
+                            text = studentsInfo.value?.familydetails?.fathername ?: "",
+                            onTextChanged = {
+                                viewModel.studentAllInfo.value?.familydetails?.fathername= it
+                            }
+                        )
+                    }
+                }
+                Row() {
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        DropDownString(
+                            label = "Qualification",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.fatherqualificationid.toString() ,
+                                studentsInfo.value?.familydetails?.fatherqualification.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Matriculation"),
+                                DropDownItemData("2", "Intermediate"),
+                                DropDownItemData("3", "Graduation"),
+                                DropDownItemData("4", "Post Graduation"),
+                                DropDownItemData("5", "Phd"),
+                                DropDownItemData("6", "Others"),
+                            ),
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.fatherqualification = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.fatherqualificationid = it.id
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Box(modifier = Modifier.weight(1f)){
+                        SampleTextField(
+                            label = "Mobile no.",
+                            text = studentsInfo.value?.familydetails?.fathermobile ?: "",
+                            onTextChanged = {
+                                viewModel.studentAllInfo.value?.familydetails?.fathermobile= it
+                            })
+                    }
+                }
+                Row{
+                    Box(modifier = Modifier.weight(1f)){
+                        DropDownString(
+                            label = "Occupation",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.fatheroccupationid.toString() ,
+                                studentsInfo.value?.familydetails?.fatheroccupation.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Teacher"),
+                                DropDownItemData("2", "Business Man"),
+                                DropDownItemData("3", "Doctor"),
+                                DropDownItemData("4", "Pilot"),
+                                DropDownItemData("5", "Professor"),
+                                DropDownItemData("6", "Private Job"),
+                                DropDownItemData("7", "Engineer"),
+                                DropDownItemData("8", "Government Employee"),
+                                DropDownItemData("9", "Others"),
+                            ),
+
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.fatheroccupation = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.fatheroccupationid = it.id
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        DropDownString(
+                            label = "Annual Income",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.fatherannualincomeid.toString() ,
+                                studentsInfo.value?.familydetails?.fatherannualincome.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "< 2 Lac"),
+                                DropDownItemData("2", "2 Lac - 4 Lac"),
+                                DropDownItemData("3", "4 Lac - 6 Lac"),
+                                DropDownItemData("4", "6 Lac - 8 Lac"),
+                                DropDownItemData("5", "8 Lac - 10 Lac"),
+                                DropDownItemData("6", "10 Lac - 12 Lac"),
+                                DropDownItemData("7", "12 Lac - 14 Lac"),
+                                DropDownItemData("8", "14 Lac - 16 Lac"),
+                                DropDownItemData("9", "16 Lac - 18 Lac"),
+                                DropDownItemData("10", "18 Lac - 20 Lac"),
+                                DropDownItemData("11", "> 20 Lac"),
+                            ),
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.fatherannualincome = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.fatherannualincomeid = it.id
+                            }
+                        )
+
+                    }
+                }
+
+            }
+            else {
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Father Name", value = studentsInfo.value?.familydetails?.fathername ?: "")
+                    }
+                }
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Qualification", value = studentsInfo.value?.familydetails?.fatherqualification ?: "")
+
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Mobile no.", value = studentsInfo.value?.familydetails?.fathermobile ?: "")
+
+                    }
+                }
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Occupation", value = studentsInfo.value?.familydetails?.fatheroccupation ?: "")
+
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Annual Income", value = studentsInfo.value?.familydetails?.fatherannualincome ?: "")
+
+                    }
+                }
+
+                //LabelField(label = "Age", value = studentsInfo.value?.familydetails?.fatherage ?: 0)
+//                LabelField(label = "Age", value = "0")
+            }
+            if (isEditable.value) {
+    Row {
+        Box(modifier = Modifier.weight(1f)){
+            SampleTextField(
+                label = "Mother Name",
+                text = studentsInfo.value?.familydetails?.mothername ?: "",
+                onTextChanged = {
+                    viewModel.studentAllInfo.value?.familydetails?.mothername= it
+                }
+            )
+        }
+    }
+    Row() {
+        Box(modifier = Modifier.weight(1f)) {
+
+            DropDownString(
+                label = "Qualification",
+                selectedItem = DropDownItemData(
+                    studentsInfo.value?.familydetails?.motherqualificationid.toString() ,
+                    studentsInfo.value?.familydetails?.motherqualification.toString()
+                ),
+                list = listOf(
+                    DropDownItemData("1", "Matriculation"),
+                    DropDownItemData("2", "Intermediate"),
+                    DropDownItemData("3", "Graduation"),
+                    DropDownItemData("4", "Post Graduation"),
+                    DropDownItemData("5", "Phd"),
+                    DropDownItemData("6", "Others"),
+                ),
+                onSelect = {
+                    viewModel.studentAllInfo.value?.familydetails?.motherqualification = it.text
+                    viewModel.studentAllInfo.value?.familydetails?.motherqualificationid = it.id
+                }
+            )
+        }
+        Spacer(modifier = Modifier.width(5.dp))
+        Box(modifier = Modifier.weight(1f)){
+            SampleTextField(
+                label = "Mobile no.",
+                text = studentsInfo.value?.familydetails?.mothermobile ?: "",
+                onTextChanged = {
+                    viewModel.studentAllInfo.value?.familydetails?.mothermobile= it
+                })
+        }
+    }
+    Row{
+        Box(modifier = Modifier.weight(1f)){
+            DropDownString(
+                label = "Occupation",
+                selectedItem = DropDownItemData(
+                    studentsInfo.value?.familydetails?.motheroccupationid.toString() ,
+                    studentsInfo.value?.familydetails?.motheroccupation.toString()
+                ),
+                list = listOf(
+                    DropDownItemData("1", "Teacher"),
+                    DropDownItemData("2", "Business Woman"),
+                    DropDownItemData("3", "Doctor"),
+                    DropDownItemData("4", "Pilot"),
+                    DropDownItemData("5", "Professor"),
+                    DropDownItemData("6", "Private Job"),
+                    DropDownItemData("7", "Engineer"),
+                    DropDownItemData("8", "Government Employee"),
+                    DropDownItemData("9", "Others"),
+                ),
+
+                onSelect = {
+                    viewModel.studentAllInfo.value?.familydetails?.motheroccupation = it.text
+                    viewModel.studentAllInfo.value?.familydetails?.motheroccupationid = it.id
+                }
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Box(modifier = Modifier.weight(1f)){
+            DropDownString(
+                label = "Annual Income",
+                selectedItem = DropDownItemData(
+                    studentsInfo.value?.familydetails?.motherannualincomeid.toString() ,
+                    studentsInfo.value?.familydetails?.motherannualincome.toString()
+                ),
+                list = listOf(
+                    DropDownItemData("1", "< 2 Lac"),
+                    DropDownItemData("2", "2 Lac - 4 Lac"),
+                    DropDownItemData("3", "4 Lac - 6 Lac"),
+                    DropDownItemData("4", "6 Lac - 8 Lac"),
+                    DropDownItemData("5", "8 Lac - 10 Lac"),
+                    DropDownItemData("6", "10 Lac - 12 Lac"),
+                    DropDownItemData("7", "12 Lac - 14 Lac"),
+                    DropDownItemData("8", "14 Lac - 16 Lac"),
+                    DropDownItemData("9", "16 Lac - 18 Lac"),
+                    DropDownItemData("10", "18 Lac - 20 Lac"),
+                    DropDownItemData("11", "> 20 Lac"),
+                ),
+                onSelect = {
+                    viewModel.studentAllInfo.value?.familydetails?.motherannualincome = it.text
+                    viewModel.studentAllInfo.value?.familydetails?.motherannualincomeid = it.id
+                }
+            )
+
+        }
+    }
+
+}
+            else {
+    Row(){
+        Box(modifier = Modifier.weight(1f)){
+            LabelField(label = "Mother Name", value = studentsInfo.value?.familydetails?.mothername ?: "")
+        }
+    }
+    Row(){
+        Box(modifier = Modifier.weight(1f)){
+            LabelField(label = "Qualification", value = studentsInfo.value?.familydetails?.motherqualification ?: "")
+
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Box(modifier = Modifier.weight(1f)){
+            LabelField(label = "Mobile no.", value = studentsInfo.value?.familydetails?.mothermobile ?: "")
+
+        }
+    }
+    Row(){
+        Box(modifier = Modifier.weight(1f)){
+            LabelField(label = "Occupation", value = studentsInfo.value?.familydetails?.motheroccupation ?: "")
+
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Box(modifier = Modifier.weight(1f)){
+            LabelField(label = "Annual Income", value = studentsInfo.value?.familydetails?.motherannualincome ?: "")
+
+        }
+    }
+
+    //LabelField(label = "Age", value = studentsInfo.value?.familydetails?.fatherage ?: 0)
+//                LabelField(label = "Age", value = "0")
+}
+            if (isEditable.value) {
+                Row {
+                    Box(modifier = Modifier.weight(1f)){
+                        SampleTextField(
+                            label = "Guardian Name",
+                            text = studentsInfo.value?.familydetails?.guardianname ?: "",
+                            onTextChanged = {
+                                viewModel.studentAllInfo.value?.familydetails?.guardianname= it
+                            }
+                        )
+                    }
+                }
+                Row() {
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        DropDownString(
+                            label = "Qualification",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.guardianqualificationid.toString() ,
+                                studentsInfo.value?.familydetails?.guardianqualification.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Matriculation"),
+                                DropDownItemData("2", "Intermediate"),
+                                DropDownItemData("3", "Graduation"),
+                                DropDownItemData("4", "Post Graduation"),
+                                DropDownItemData("5", "Phd"),
+                                DropDownItemData("6", "Others"),
+                            ),
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.guardianqualification = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.guardianqualificationid = it.id
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Box(modifier = Modifier.weight(1f)){
+                        SampleTextField(
+                            label = "Mobile no.",
+                            text = studentsInfo.value?.familydetails?.guardianmobile ?: "",
+                            onTextChanged = {
+                                viewModel.studentAllInfo.value?.familydetails?.guardianmobile= it
+                            })
+                    }
+                }
+                Row{
+                    Box(modifier = Modifier.weight(1f)){
+                        DropDownString(
+                            label = "Occupation",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.guardianoccupationid.toString() ,
+                                studentsInfo.value?.familydetails?.guardianoccupation.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Teacher"),
+                                DropDownItemData("2", "Business Man"),
+                                DropDownItemData("3", "Doctor"),
+                                DropDownItemData("4", "Pilot"),
+                                DropDownItemData("5", "Professor"),
+                                DropDownItemData("6", "Private Job"),
+                                DropDownItemData("7", "Engineer"),
+                                DropDownItemData("8", "Government Employee"),
+                                DropDownItemData("9", "Others"),
+                            ),
+
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.guardianoccupation = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.guardianoccupationid = it.id
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        DropDownString(
+                            label = "Annual Income",
+                            selectedItem = DropDownItemData(
+                                studentsInfo.value?.familydetails?.guardianannualincomeid.toString() ,
+                                studentsInfo.value?.familydetails?.guardianannualincome.toString()
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "< 2 Lac"),
+                                DropDownItemData("2", "2 Lac - 4 Lac"),
+                                DropDownItemData("3", "4 Lac - 6 Lac"),
+                                DropDownItemData("4", "6 Lac - 8 Lac"),
+                                DropDownItemData("5", "8 Lac - 10 Lac"),
+                                DropDownItemData("6", "10 Lac - 12 Lac"),
+                                DropDownItemData("7", "12 Lac - 14 Lac"),
+                                DropDownItemData("8", "14 Lac - 16 Lac"),
+                                DropDownItemData("9", "16 Lac - 18 Lac"),
+                                DropDownItemData("10", "18 Lac - 20 Lac"),
+                                DropDownItemData("11", "> 20 Lac"),
+                            ),
+                            onSelect = {
+                                viewModel.studentAllInfo.value?.familydetails?.guardianannualincome = it.text
+                                viewModel.studentAllInfo.value?.familydetails?.guardianannualincomeid = it.id
+                            }
+                        )
+
+                    }
+                }
+
+            }
+            else {
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Guardian Name", value = studentsInfo.value?.familydetails?.guardianname ?: "")
+                    }
+                }
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Qualification", value = studentsInfo.value?.familydetails?.guardianqualification ?: "")
+
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Mobile no.", value = studentsInfo.value?.familydetails?.guardianmobile ?: "")
+
+                    }
+                }
+                Row(){
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Occupation", value = studentsInfo.value?.familydetails?.guardianoccupation ?: "")
+
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(modifier = Modifier.weight(1f)){
+                        LabelField(label = "Annual Income", value = studentsInfo.value?.familydetails?.guardianannualincome ?: "")
+
+                    }
+                }
+
+                //LabelField(label = "Age", value = studentsInfo.value?.familydetails?.fatherage ?: 0)
+//                LabelField(label = "Age", value = "0")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LightMainColor)
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                if (isEditable.value) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = false
+                        }) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Close, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Cancel",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = false
+                        }) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Check, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Update",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Settings, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Manage",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(start = 3.dp, top = 4.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = true
+                        }) {
+
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Edit, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Edit",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+}

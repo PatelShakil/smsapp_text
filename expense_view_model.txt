@@ -1,0 +1,113 @@
+//add this repo objects in constructor
+
+    private val ledgerHeadRepo : LedgerHead,
+    private val expenseRecordRepo : ExpenseRecord,
+    private val ledgerDashboardRepo : com.mycampus.smsapp.data.repo.ledger.LedgerDashboard
+
+
+//TODO// Ledger Dashboard
+    private val _ledgerDashboard = MutableStateFlow<Resource<LedgerDashBoard>?>(null)
+    val ledgerDashBoard : MutableStateFlow<Resource<LedgerDashBoard>?>
+        get() = _ledgerDashboard
+
+    init {
+        getLedgerDashboard()
+    }
+
+    fun getLedgerDashboard() = viewModelScope.launch {
+        _ledgerDashboard.value = ledgerDashboardRepo.getLedgerDashboard()
+    }
+    fun getLedgerDashboard( headId : Int,fromDate: String,toDate : String) = viewModelScope.launch {
+        _ledgerDashboard.value = ledgerDashboardRepo.getLedgerDashboard(headId,fromDate,toDate)
+    }
+
+
+
+
+    //TODO// Ledger Record
+    private val _expenseList =
+        MutableStateFlow<Resource<ArrayList<com.mycampus.smsapp.data.models.ledger.LedgerRecordItem>>?>(null)
+    val expenseList : MutableStateFlow<Resource<ArrayList<com.mycampus.smsapp.data.models.ledger.LedgerRecordItem>>?>
+        get() = _expenseList
+
+//    init {
+//        getExpenseList()
+//    }
+
+    fun getExpenseList() = viewModelScope.launch {
+        _expenseList.value = expenseRecordRepo.getExpenseList()
+    }
+    fun getExpenseList(headId : Int) = viewModelScope.launch {
+        _expenseList.value = expenseRecordRepo.getExpenseList(headId)
+    }
+
+    fun createExpense(item: LedgerRecordItem) = viewModelScope.launch {
+        expenseRecordRepo.createExpense(item).let {
+            when(it){
+                is Resource.Success->{
+                    getExpenseList()
+                }
+                else -> {}
+            }
+        }
+    }
+    fun updateExpense(item: LedgerRecordItem) = viewModelScope.launch {
+        expenseRecordRepo.updateExpense(item).let {
+            when(it){
+                is Resource.Success->{
+                    getExpenseList()
+                }
+                else -> {}
+            }
+        }
+        getExpenseList()
+    }
+    fun deleteExpense(id : Int) = viewModelScope.launch {
+        expenseRecordRepo.deleteExpense(id).let {
+            when(it){
+                is Resource.Success->{
+                    getExpenseList()
+                }
+                else -> {}
+            }
+        }
+    }
+
+
+
+
+    //ledger head
+
+    private val _ledgerHeadList =
+        MutableStateFlow<Resource<ArrayList<com.mycampus.smsapp.data.models.ledger.LedgerHeadItem>>?>(null)
+    val ledgerHeadList : MutableStateFlow<Resource<ArrayList<com.mycampus.smsapp.data.models.ledger.LedgerHeadItem>>?>
+        get() = _ledgerHeadList
+
+//    init {
+//        getLedgerHeadList()
+//    }
+
+    fun createLedgerHead(item : LedgerHeadItem) = viewModelScope.launch {
+        ledgerHeadRepo.createLedgerHead(item).let {
+            when(it){
+                is Resource.Success->{
+                    getLedgerHeadList()
+                }
+                else -> {}
+            }
+        }
+    }
+    fun updateLedgerHead(item : LedgerHeadItem) = viewModelScope.launch {
+        ledgerHeadRepo.updateLedgerHead(item).let {
+            when(it){
+                is Resource.Success->{
+                    getLedgerHeadList()
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun getLedgerHeadList() = viewModelScope.launch {
+        _ledgerHeadList.value = ledgerHeadRepo.getLedgerHeadList()
+    }

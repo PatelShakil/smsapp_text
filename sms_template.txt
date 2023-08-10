@@ -1,0 +1,167 @@
+@Composable
+fun TopCardSMSTemplate() {
+    val spacing = MaterialTheme.spacing
+    val educationalYear = "2023-24"
+    androidx.compose.material.Card(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.background(Color(0xFFFEFEFE))) {
+            val (cardNameText,cardImage,currentYearText) = createRefs()
+            Text(text = "Your SMS Templates",
+                modifier = Modifier
+                    .padding(start = spacing.medium, top = spacing.medium / 2)
+                    .constrainAs(cardNameText) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.5f)
+                    .background(Color(0xFFFDFEFE)),
+                style = MaterialTheme.typography.titleMedium,
+                color = MainColor,
+                fontSize = 19.sp,
+                softWrap = true)
+            Image(painterResource(id = R.drawable.sms_template), contentDescription = "noticeboard",
+                modifier = Modifier
+                    .constrainAs(cardImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .height(120.dp)
+                    .width(150.dp),
+                contentScale = ContentScale.FillBounds)
+
+
+            Box(modifier = Modifier
+                .padding(start = spacing.medium)
+                .border(1.dp, Color.Gray, CircleShape)
+                .constrainAs(currentYearText) {
+                    top.linkTo(cardNameText.bottom)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+                .background(Color.White, CircleShape)) {
+                androidx.compose.material.Text(text = "$educationalYear", modifier = Modifier
+                    .padding(horizontal = spacing.medium / 2),
+                )
+            }
+        }
+    }
+}
+data class SMSTemplateData(
+    val tempType : String,
+    val status: String,
+    val tempName :String,
+    val tempFor : String,
+    val tempDetails: String,
+    val color: Color
+)
+
+@Composable
+fun SMSReportSampleItem(data : SMSTemplateData) {
+    Card(elevation = CardDefaults.cardElevation(30.dp), modifier = Modifier
+        .fillMaxWidth(.95f)
+        .wrapContentHeight()
+        .padding(top = 5.dp)
+        .border(0.5.dp, Gray, RoundedCornerShape(12.dp))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(White)
+                .padding(start = 10.dp, end = 10.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp)
+                    .background(data.color, RoundedCornerShape(15.dp))
+            ) {
+                Text(
+                    text = "${data.tempType} Template for ${data.tempFor}", modifier = Modifier
+                        .fillMaxWidth(.9f)
+                        .align(Alignment.Center),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Status : ${data.status}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 15.dp),
+                        textAlign = TextAlign.Start,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "Template Name : ${data.tempName}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "Template Details :",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = data.tempDetails,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                    )
+                }
+                Box(modifier = Modifier
+                    .padding(top = 10.dp)
+                    .height(70.dp)
+                    .width(70.dp)
+                    .background(data.color, CircleShape)
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.draft_ic), "",
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(50.dp)
+                            .align(Alignment.Center),
+                        tint = White
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .padding(top = 10.dp, bottom = 10.dp)
+                    .fillMaxWidth()
+            ) {
+                /*
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Icon(
+                        painterResource(id = R.drawable.ic_calender_dashboard),
+                        contentDescription = "",
+                        tint = MainColor
+                    )
+                    Text(
+                        text = data.createdAt.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm a")),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth(.9f)
+                            .padding(top = 4.dp),
+                        textAlign = TextAlign.Start,
+                    )
+                }*/
+                /*Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                    Icon(Icons.Default.MoreVert, "",
+                        modifier = Modifier.align(Alignment.TopEnd))
+                }
+*/
+            }
+        }
+    }
+}

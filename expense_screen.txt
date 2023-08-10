@@ -1,0 +1,632 @@
+//calling fun
+ExpenseCallingFunction(viewModel)
+
+//layout files
+
+@Composable
+fun ExpenseCallingFunction(viewModel: HomeViewModel) {
+    ExpenseMainScreen()
+}
+
+@Composable
+fun ExpenseMainScreen() {
+    Box(modifier = Modifier.fillMaxSize()){
+        var isAddExpense by remember{ mutableStateOf(false) }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            FilterRowCard()
+            Spacer(modifier = Modifier.height(5.dp))
+            ExpenseTopCard()
+            Spacer(modifier = Modifier.height(10.dp))
+            ExpenseChartCard()
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                "Recent Transaction",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp)
+            )
+            RecentTransactionItem(true)
+            Spacer(modifier = Modifier.height(5.dp))
+            RecentTransactionItem(isIncome = false)
+
+
+        }
+        FloatingActionButton(onClick = {
+            isAddExpense = !isAddExpense
+        },
+            modifier = Modifier
+                .align(BottomEnd)
+                .padding(30.dp)) {
+            Icon(imageVector = Icons.Default.Add,"",
+                tint = MainColor)
+        }
+        if (isAddExpense) {
+            AddExpensePopupScreen(onDismiss = {
+                isAddExpense = !isAddExpense
+            }) {
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterRowCard() {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)) {
+        Spacer(modifier = Modifier.height(5.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    "October's Report",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Black
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .weight(.5f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter_blue_30), "",
+                    tint = MainColor
+                )
+                Text(
+                    "Filter",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(top = 3.dp )
+                )
+            }
+            Spacer(Modifier.width(5.dp))
+        }
+        Spacer(modifier = Modifier.height(5.dp))
+    }
+}
+
+@Composable
+fun ExpenseTopCard() {
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+//    border = BorderStroke(.5.dp, Color.Gray),
+        elevation = CardDefaults.cardElevation(30.dp)
+    ){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)) {
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_expense),
+                        "",
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(60.dp)
+                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Expense",
+                            style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Black)
+                        Text("₹1000.0",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MainColor)
+                    }
+                }
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_income),
+                        "",
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(60.dp)
+
+                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Income",
+                            style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Black)
+                        Text("₹10000.0",
+                            style = MaterialTheme.typography.titleMedium,
+                        color = MainColor)
+                    }
+                    Spacer(Modifier.width(15.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .height(.5.dp), color = Color.Gray)
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth(.95f), verticalAlignment = Alignment.CenterVertically) {
+                Text("₹ 10000.0",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier
+                    .weight(.6f)
+                    .padding(start = 15.dp),
+                    color = MainColor)
+                Text("Opening Balance",
+                    modifier = Modifier.weight(.4f),
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.End)
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .height(.5.dp), color = Color.Gray)
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth(.95f), verticalAlignment = Alignment.CenterVertically) {
+                Text("₹ 60000.0",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier
+                    .weight(.6f)
+                    .padding(start = 15.dp),
+                    color = MainColor)
+                Text("Closing Balance",
+                    modifier = Modifier.weight(.4f),
+                style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.End)
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+}
+
+@Composable
+fun ExpenseChartCard() {
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+//    border = BorderStroke(.5.dp, Color.Gray),
+        elevation = CardDefaults.cardElevation(30.dp)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.height(5.dp))
+            Text("Expense Chart")
+            Row {
+                PieChart()
+            }
+        }
+    }
+}
+
+data class PieChartData(
+    var textName: String?,
+    var value: Float?
+)
+
+val getPieChartData = listOf(
+    PieChartData("Books", 49F),
+    PieChartData("Salary", 20F),
+    PieChartData("Dress", 15F),
+    PieChartData("Bills", 10F),
+)
+
+@Composable
+fun PieChart() {
+    // on below line we are creating a column
+    // and specifying a modifier as max size.
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // on below line we are again creating a column
+        // with modifier and horizontal and vertical arrangement
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // on below line we are creating a column and
+            // specifying the horizontal and vertical arrangement
+            // and specifying padding from all sides.
+             val colorList = arrayListOf(
+                                Color(0xFF00C853).toArgb(),
+                                Color(0xFFFFAB00).toArgb(),
+                                Color(0xFFFF6D00).toArgb(),
+                                Color(0xFF64DD17).toArgb()
+                            )
+
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .size(170.dp)
+                    .weight(.7f),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // on below line we are creating a cross fade and
+                // specifying target state as pie chart data the
+                // method we have created in Pie chart data class.
+                    Crossfade(targetState = getPieChartData) { pieChartData ->
+                        // on below line we are creating an
+                        // android view for pie chart.
+                        AndroidView(factory = { context ->
+                            // on below line we are creating a pie chart
+                            // and specifying layout params.
+                            PieChart(context).apply {
+                                layoutParams = LinearLayout.LayoutParams(
+                                    // on below line we are specifying layout
+                                    // params as MATCH PARENT for height and width.
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                )
+                                // on below line we are setting description
+                                // enables for our pie chart.
+                                this.description.isEnabled = false
+
+
+                                this.centerText = "Expense\n12"
+                                this.setCenterTextColor(Color.Black.toArgb())
+                                this.setCenterTextSize(12f)
+                                // on below line we are setting draw hole
+                                // to false not to draw hole in pie chart
+                                this.isDrawHoleEnabled = true
+                                this.setDrawSlicesUnderHole(true)
+
+                                // on below line we are enabling legend.
+                                this.legend.isEnabled = false
+
+                                // on below line we are specifying
+                                // text size for our legend.
+                                this.legend.textSize = 11F
+
+                                // on below line we are specifying
+                                // alignment for our legend.
+                                this.legend.horizontalAlignment =
+                                    Legend.LegendHorizontalAlignment.CENTER
+
+                                // on below line we are specifying entry label color as white.
+                                this.setEntryLabelColor(Color.Black.toArgb())
+                                this.setEntryLabelTextSize(14f)
+                            }
+                        },
+                            // on below line we are specifying modifier
+                            // for it and specifying padding to it.
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(5.dp), update = {
+                                // on below line we are calling update pie chart
+                                // method and passing pie chart and list of data.
+                                updatePieChartWithData(it, pieChartData,colorList)
+                            })
+                    }
+            }
+
+                Column(horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(.3f)) {
+                    getPieChartData.forEachIndexed {index,it->
+                        Spacer(modifier = Modifier.height(3.dp))
+                        PieDataListItem(it,colorList[index])
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+fun updatePieChartWithData(
+    chart: PieChart,
+    data: List<PieChartData>,
+    colorList : MutableList<Int>
+) {
+    // on below line we are creating
+    // array list for the entries.
+    val entries = ArrayList<PieEntry>()
+
+    // on below line we are running for loop for
+    // passing data from list into entries list.
+    for (i in data.indices) {
+        val item = data[i]
+        entries.add(PieEntry(item.value ?: 0.toFloat(), item.textName ?: ""))
+    }
+
+    // on below line we are creating
+    // a variable for pie data set.
+    val ds = PieDataSet(entries, "")
+
+    // on below line we are specifying color
+    // int the array list from colors.
+    ds.colors = colorList
+    // on below line we are specifying position for value
+    ds.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
+
+    // on below line we are specifying position for value inside the slice.
+    ds.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+
+    // on below line we are specifying
+    // slice space between two slices.
+    ds.sliceSpace = 2f
+
+    // on below line we are specifying text color
+    ds.valueTextColor = Color.White.toArgb()
+
+    // on below line we are specifying
+    // text size for value.
+    ds.valueTextSize = 12f
+    // on below line we are specifying type face as bold.
+    ds.valueTypeface = Typeface.DEFAULT_BOLD
+
+    // on below line we are creating
+    // a variable for pie data
+    val d = PieData(ds)
+
+    // on below line we are setting this
+    // pie data in chart data.
+    chart.data = d
+
+    // on below line we are
+    // calling invalidate in chart.
+    chart.invalidate()
+}
+
+@Composable
+fun PieDataListItem(data : PieChartData,color : Int) {
+    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier
+            .background(Color(color), RectangleShape)
+            .size(10.dp))
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(data.textName.toString(),style = MaterialTheme.typography.bodySmall,
+        fontSize = 11.sp)
+    }
+
+}
+
+@Composable
+fun RecentTransactionItem(isIncome : Boolean) {
+        Card(modifier = Modifier.fillMaxWidth(.95f),
+//        border = BorderStroke(.5.dp, Color.Gray),
+            elevation = CardDefaults.cardElevation(30.dp)
+        ){
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(modifier= Modifier.fillMaxWidth(.95f), verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(LightMainColor),
+                    contentAlignment = Alignment.Center){
+                        Icon(painter = painterResource(id = R.drawable.cash_payments_ic),
+                            contentDescription = "",
+                        tint = MainColor,
+                        modifier = Modifier.size(30.dp))
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.weight(.4f)) {
+                        Text(text = "26 Oct 2023",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 10.sp)
+                        Text("Work desk",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Black)
+                        Text("Mandiri debit card",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 10.sp)
+                    }
+                    Text(text = if(isIncome) "+ ₹250" else "- ₹250",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Black,
+                    color = if (isIncome) Color.Green else Color.Red,
+                    modifier = Modifier.weight(.1f))
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+        }
+}
+
+@Composable
+fun AddExpensePopupScreen(
+    onDismiss:()-> Unit,
+    onConfirm:()-> Unit
+) {
+    var date by remember{ mutableStateOf("") }
+    Dialog(onDismissRequest = {
+        onDismiss()
+    },
+    properties = DialogProperties(
+        usePlatformDefaultWidth = false
+    )
+    ) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp)
+            .background(Color.Transparent),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(modifier = Modifier.fillMaxWidth(.95f)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(25.dp)
+                        .background(Color.White),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically){
+                        Divider(modifier = Modifier
+                            .height(6.dp)
+                            .width(50.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = MainColor)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text("Add your expense",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MainColor,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 30.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Column(modifier = Modifier.fillMaxWidth(.95f),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddExpenseTextField(
+                            icon = R.drawable.ic_rupee_blue,
+                            label = "Amount",
+                            onTextChanged = {
+
+                            },
+                            KeyboardType.Number
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        val list = listOf(
+                                DropDownItemData("1", "Books vendor"),
+                                DropDownItemData("2", "Dress vendor"),
+                                DropDownItemData("3", "Builder"),
+                                DropDownItemData("4", "Furniture vendor"))
+                        DropDownCategory(label = "Category", selectedItem = list[0], list = list , onSelect ={
+
+                        } )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        var isDatePickerShow by remember{ mutableStateOf(false) }
+                        androidx.compose.material.OutlinedTextField(value = date, onValueChange = {},
+                            leadingIcon = {
+                                Icon(painterResource(id = R.drawable.ic_calender_dashboard), contentDescription = "",
+                                    tint = MainColor)
+                            },
+                            label = {androidx.compose.material.Text("Date",color = MainColor)},
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MainColor
+                            ),
+                            trailingIcon = {
+                                Box(modifier = Modifier
+                                    .size(25.dp)
+                                    .clip(CircleShape)
+                                    .border(.5.dp, MainColor, CircleShape)
+                                    .clickable {
+                                        isDatePickerShow = !isDatePickerShow
+                                    },
+                                contentAlignment = Alignment.Center){
+                                    Icon(imageVector = Icons.Default.Edit,"",
+                                    tint = MainColor,
+                                    modifier = Modifier
+                                        .size(17.dp))
+                                }
+                            }
+                        )
+                        if (isDatePickerShow) {
+                            val datePicker = android.app.DatePickerDialog(LocalContext.current)
+                            datePicker.setOnDateSetListener { datePicker, d, m, y ->
+                                date = "$y-${m+1}-$d"
+                                isDatePickerShow = !isDatePickerShow
+                            }
+                            datePicker.show()
+                        }
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddExpenseTextField(
+                            icon = R.drawable.ic_assignment_dashboard,
+                            label = "Notes",
+                            onTextChanged = {}
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Button(modifier = Modifier
+                            .fillMaxWidth(.9f),
+                        onClick = {
+                            onConfirm()
+                            onDismiss()
+                        }){
+                            Text("Add")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+
+                }
+            }
+        }
+    }
+}
+@Composable
+fun DropDownCategory(
+    label: String,
+    selectedItem: DropDownItemData,
+    list: List<DropDownItemData>,
+    onSelect: (DropDownItemData) -> Unit
+) {
+    val expanded = remember { mutableStateOf(false) }
+    val selected = remember { mutableStateOf(selectedItem) }
+    val icon = if (expanded.value)
+        Icons.Default.KeyboardArrowUp //it requires androidx.compose.material:material-icons-extended
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(.7f)
+                .background(Color.White)
+        ) {
+            androidx.compose.material.OutlinedTextField(
+                value = selected.value.text,
+                readOnly = true,
+                onValueChange = {},
+                modifier = Modifier
+                    .clickable {
+                        expanded.value = !expanded.value
+                    }
+                    .fillMaxWidth(),
+//                placeholder = { Text(placeHolder) },
+                label = { androidx.compose.material.Text(label,color = MainColor) },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MainColor)
+            )
+            androidx.compose.material.DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+            ) {
+                list.forEach { label ->
+                    androidx.compose.material.DropdownMenuItem(onClick = {
+                        selected.value = label
+                        expanded.value = false
+                        onSelect(label)
+                    },
+                        content = { androidx.compose.material.Text(label.text) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddExpenseTextField(icon : Int,label : String,onTextChanged:(String)->Unit,keyboardType : KeyboardType = KeyboardType.Text) {
+    var tv by remember{ mutableStateOf("") }
+    androidx.compose.material.OutlinedTextField(value = tv, onValueChange = {tv = it
+                                                                            onTextChanged(it)},
+        leadingIcon = {
+            Icon(painterResource(id = icon), contentDescription = "",
+            tint = MainColor)
+        },
+        label = {androidx.compose.material.Text(label,color = MainColor)},
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MainColor
+        ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        )
+    )
+}

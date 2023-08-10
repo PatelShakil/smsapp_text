@@ -1,0 +1,318 @@
+//replace DatePickerDialogCustom() fun with below fun
+
+@Composable
+fun DatePickerDialogCustom(
+    label: String,
+    onDateSelect: (String, String, String) -> Unit
+) {
+    var cdate by remember {
+        mutableStateOf("")
+    }
+    var isDatePickerShow by remember { mutableStateOf(false) }
+    androidx.compose.material.OutlinedTextField(value = cdate, onValueChange = {},
+        leadingIcon = {
+            Icon(
+                painterResource(id = R.drawable.ic_calender_dashboard), contentDescription = "",
+                tint = MainColor
+            )
+        },
+        label = { androidx.compose.material.Text(label, color = MainColor) },
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MainColor
+        ),
+        trailingIcon = {
+            Box(
+                modifier = Modifier
+                    .size(25.dp)
+                    .clip(CircleShape)
+                    .border(.5.dp, MainColor, CircleShape)
+                    .clickable {
+                        isDatePickerShow = !isDatePickerShow
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit, "",
+                    tint = MainColor,
+                    modifier = Modifier
+                        .size(17.dp)
+                )
+            }
+        }
+    )
+    if (isDatePickerShow) {
+        val datePicker = android.app.DatePickerDialog(LocalContext.current)
+        datePicker.setOnDateSetListener { datePicker, year, month, date ->
+            cdate = "$date-${month + 1}-$year"
+            isDatePickerShow = !isDatePickerShow
+            onDateSelect(date.toString(), (month + 1).toString(), year.toString())
+        }
+        datePicker.show()
+    }
+}
+
+//replace DashboardFilterPopup() fun with below fun
+
+@Composable
+fun DashboardFilterPopup(
+    headList: List<LedgerHeadItem>,
+    onDismiss: () -> Unit,
+    onConfirm: (LedgerHeadItem?, CustomDate?, CustomDate?, Boolean, Boolean) -> Unit,
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(modifier = Modifier.fillMaxWidth(.95f)) {
+            var selectedHead by remember { mutableStateOf(LedgerHeadItem(id = 0)) }
+            var fromDate by remember { mutableStateOf(CustomDate()) }
+            var toDate by remember { mutableStateOf(CustomDate()) }
+            var isIncomeChecked by remember { mutableStateOf(true) }
+            var isExpenseChecked by remember { mutableStateOf(true) }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(15.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filter_blue_30),
+                        "",
+                        tint = MainColor
+                    )
+                    androidx.compose.material3.Text("Ledger Dashboard Filter")
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth(.95f)
+                        .height(1.dp), color = Color.Gray
+                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(.95f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DropDownHead(
+                        modifier = Modifier.fillMaxWidth(),
+                        selectedItem = (DropDownItemData(
+                            0.toString(),
+                            selectedHead.ledgername
+                        )),
+                        list = headList.map { DropDownItemData(it.id.toString(), it.ledgername) },
+                        onSelect = {
+                            if (it.id == "0") {
+                                selectedHead = LedgerHeadItem(id = 0)
+                            } else {
+                                selectedHead =
+                                    headList.filter { head -> head.id == it.id.toInt() }[0]
+                            }
+                        })
+                    Spacer(modifier = Modifier.height(5.dp))
+                    DatePickerDialogCustom(
+                        label = "From Date",
+                        onDateSelect = { date, month, year ->
+                            fromDate = CustomDate(date, month, year)
+                        })
+                    Spacer(modifier = Modifier.height(5.dp))
+                    DatePickerDialogCustom(
+                        label = "To Date",
+                        onDateSelect = { date, month, year ->
+                            toDate = CustomDate(date, month, year)
+                        })
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CustomCheckBox(
+                            label = "Income",
+                            curState = isIncomeChecked,
+                            onCheckedChange = {
+                                isIncomeChecked = it
+                            })
+                        Spacer(modifier = Modifier.width(5.dp))
+                        CustomCheckBox(
+                            label = "Expense",
+                            curState = isExpenseChecked,
+                            onCheckedChange = {
+                                isExpenseChecked = it
+                            })
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            onConfirm(
+                                selectedHead,
+                                fromDate,
+                                toDate,
+                                isIncomeChecked,
+                                isExpenseChecked
+                            )
+                            selectedHead = LedgerHeadItem()
+                            fromDate = CustomDate()
+                            toDate = CustomDate()
+                            isIncomeChecked = true
+                            isExpenseChecked = true
+                            onDismiss()
+                        },
+                        modifier = Modifier.fillMaxWidth(.9f)
+                    ) {
+                        Text("Submit")
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+//replace ExpenseDashboardScreen() fun with below function
+
+@Composable
+fun ExpenseDashboardScreen(navController: NavController, viewModel: HomeViewModel) {
+    var isFilterClicked by remember { mutableStateOf(false) }
+    var isFilterCloseEnabled by remember { mutableStateOf(false) }
+    var filterMsg by remember { mutableStateOf("Till Now Info") }
+    var isFilterDataSelected by remember { mutableStateOf(false) }
+    var isIncome by remember { mutableStateOf(true) }
+    var isExpense by remember { mutableStateOf(true) }
+    LaunchedEffect(key1 = "") {
+        viewModel.getLedgerHeadList()
+    }
+    val headList = viewModel.ledgerHeadList.collectAsState().value.let { data ->
+        when (data) {
+            is Resource.Success -> {
+                data.result
+            }
+
+            else -> {
+                ArrayList<LedgerHeadItem>()
+            }
+        }
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(modifier = Modifier.width(5.dp))
+            if (isFilterCloseEnabled) {
+                Icon(imageVector = Icons.Default.Clear, "",
+                    tint = MainColor,
+                    modifier = Modifier
+                        .clickable {
+                            isFilterDataSelected = false
+                            isFilterCloseEnabled = false
+                            filterMsg = "Till Now Info"
+                            viewModel.getLedgerDashboard()
+                        })
+                Spacer(modifier = Modifier.width(5.dp))
+            }
+            FilterRowCard(
+                filterMsg
+            ) {
+                isFilterClicked = true
+            }
+        }
+        viewModel.ledgerDashBoard.collectAsState().value.let {
+            when (it) {
+                is Resource.Failure -> {
+                    if (it.errorMsgBody.contains("204")) {
+                        onAPIFailed("No data for selected Filter ", false)
+                        /*Spacer(modifier = Modifier.height(15.dp))
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "",
+                            tint = MainColor,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable {
+                                viewModel.getLedgerDashboard()
+                            })
+                        Text("Reload",
+                        color = MainColor)*/
+
+                    } else
+                        onAPIFailed("Ledger Dashboard Info (${it.errorCodeDescription}-${it.errorCode})")
+                }
+
+                is Resource.Loading -> {
+                    FullScreenProgressbar()
+                }
+
+                is Resource.Success -> {
+                    if (it.result == null) {
+                        //Need to Handle Empty Screen
+                    } else {
+                        if (isFilterDataSelected) {
+                            LedgerDashboardFilterScreen(
+                                data = it.result,
+                                navController = navController,
+                                isIncome,
+                                isExpense
+                            )
+                        } else {
+                            LedgerDashboardMainScreen(data = it.result, navController)
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        }
+        if (isFilterClicked) {
+            DashboardFilterPopup(headList = headList,
+                onDismiss = {
+                    isFilterClicked = false
+                },
+                onConfirm = { headItem, mfromDate, mtoDate, isIncomeCheckd, isExpenseChecked ->
+                    isFilterCloseEnabled = true
+                    isFilterDataSelected = true
+                    isIncome = isIncomeCheckd
+                    isExpense = isExpenseChecked
+                    val fromDate: String?
+                    val toDate: String?
+                    if (mfromDate != CustomDate()) {
+                        fromDate = "${mfromDate?.year}-${mfromDate?.month}-${mfromDate?.date}"
+                    } else {
+                        fromDate = ""
+                    }
+                    if (mtoDate != CustomDate()) {
+                        toDate = "${mtoDate?.year}-${mtoDate?.month}-${mtoDate?.date}"
+                    } else {
+                        toDate = ""
+                    }
+                    val fromDMY = "${mfromDate?.date}-${mfromDate?.month}-${mfromDate?.year}"
+                    val toDMY = "${mtoDate?.date}-${mtoDate?.month}-${mtoDate?.year}"
+                    Log.d("Fromdate,HeadId,Todate", fromDate + headItem?.id + toDate)
+                    viewModel.getLedgerDashboard(headItem!!.id, fromDate!!, toDate!!)
+
+                    if (headItem != null && fromDate != "" && toDate != "")
+                        filterMsg = "$fromDMY to $toDMY"
+                    else if (headItem == null && toDate == "" && fromDate != "")
+                        filterMsg = "$fromDMY"
+                    else if (fromDate == "" && toDate == "" && headItem != null)
+                        filterMsg = "Head Wise Data"
+                    else if (fromDate != "" && headItem != null && toDate == "")
+                        filterMsg = "$fromDMY"
+                })
+        }
+    }
+}
+
+//required class
+
+data class CustomDate(
+    val date: String = "",
+    val month: String = "",
+    val year: String = ""
+)

@@ -1,0 +1,134 @@
+data class CommitmentData(
+    val reason: String,
+    val dateTime : LocalDateTime
+)
+@Composable
+fun CommitmentScreen() {
+    Column(modifier = Modifier.fillMaxSize(),horizontalAlignment = Alignment.CenterHorizontally) {
+        var commitmentData : CommitmentData
+        Spacer(modifier = Modifier.height(10.dp))
+        AddNewCommitmentCard(onSave = {commitmentData = it })
+        Spacer(modifier = Modifier.height(5.dp))
+        ShowCommitment(data = CommitmentData("Not able to pay due to salary issue", LocalDateTime.now()))
+    }
+}
+@Composable
+fun AddNewCommitmentCard(onSave:(CommitmentData)-> Unit) {
+    val reason = remember{ mutableStateOf("") }
+    Card(modifier = Modifier.fillMaxWidth(.95f)) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Add Commitment",
+            style = MaterialTheme.typography.titleSmall)
+            Divider(modifier = Modifier
+                .height(1.dp)
+                .background(Gray)
+                .fillMaxWidth())
+            Spacer(modifier = Modifier.height(5.dp))
+            TextField(value = reason.value, onValueChange ={reason.value= it},
+            label = {Text("Reason")},
+                placeholder = {Text("Enter reason for leave")},
+            singleLine = false,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp),
+            colors = androidx.compose.material.TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFDCE3E6)))
+            Spacer(modifier = Modifier.height(5.dp))
+            Button(onClick = {onSave(CommitmentData(reason.value, LocalDateTime.now())) }) {
+                Text("Save")
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+}
+@Composable
+fun ShowCommitment(data : CommitmentData) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .border(.5.dp, Gray, RoundedCornerShape(15.dp)), shape = RoundedCornerShape(15.dp)){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(White), horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.height(5.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth(.95f)
+                .background(LightMainColor, RoundedCornerShape(15.dp))){
+                Text(data.reason,style = MaterialTheme.typography.titleSmall, softWrap = true,
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxWidth(.9f)
+                    .align(Alignment.Center))
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth(.9f)){
+                Column(modifier = Modifier
+                    .fillMaxWidth(.7f)
+                    .padding(start = 15.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        Box(modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp)
+                            .clip(CircleShape)
+                            .background(
+                                White
+                            )) {
+                            Icon(
+                                painterResource(id = com.mahmoud.composecharts.R.drawable.ic_clock_black_24dp), "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(data.dateTime.format(DateTimeFormatter.ofPattern("hh:mm a")),
+                        style = MaterialTheme.typography.bodySmall,modifier = Modifier.padding(top = 3.dp))
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        Box(modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp)
+                            .clip(CircleShape)
+                            .background(
+                                White
+                            )) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_calender_dashboard), "",
+                                tint = MainColor,
+                            )
+                        }
+                        Text(data.dateTime.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+                            style = MaterialTheme.typography.bodySmall,modifier = Modifier.padding(top = 3.dp))
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        Box(modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp)
+                            .clip(CircleShape)
+                            .background(
+                                White
+                            )) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_calender_dashboard), "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(data.dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                            style = MaterialTheme.typography.bodySmall,modifier = Modifier.padding(top = 3.dp))
+                    }
+                }
+                Box(modifier = Modifier
+                    .padding(start = 30.dp, top = 10.dp)
+                    .clip(CircleShape)
+                    .height(60.dp)
+                    .width(60.dp)
+                    .background(LightMainColor, CircleShape)){
+                    Icon(painterResource(id = R.drawable.ic_message_blue),"",
+                        tint = MainColor,
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(40.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+    
+}

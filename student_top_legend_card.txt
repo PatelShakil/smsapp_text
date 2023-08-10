@@ -1,0 +1,138 @@
+
+//there is no need to change anything just replace StudentTopLegendCard function with this.
+
+@Composable
+fun StudentTopLegendCard(
+    totalCount: Int, maleCount: Int, femaleCount: Int, isFeeWindow: Boolean = false
+) {
+    val spacing = MaterialTheme.spacing
+    var isTutorial by remember { mutableStateOf(false) }
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .padding(start = spacing.medium, end = spacing.medium, top = spacing.medium)
+        .clickable { }) {
+        Column(
+            //modifier = Modifier.padding(spacing.medium)
+            //modifier = Modifier.background(Color(0xFFF3D9D5), RoundedCornerShape(12.dp))
+            modifier = Modifier.background(LightMainColor, RoundedCornerShape(12.dp))
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Total Results ( ${totalCount} )",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(top = spacing.small),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                )
+                Icon(imageVector = Icons.Default.Info, contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            isTutorial = true
+                        }
+                        .padding(top = 2.dp, start = 5.dp),
+                    tint = MainColor
+                )
+            }
+
+            Divider(modifier = Modifier.padding(bottom = spacing.small))
+
+            if (isFeeWindow) {
+                Row {
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Unpaid - ${femaleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Paid - ${maleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            } else {
+                Row {
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .width(20.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFD3E9E1))
+                                .border(1.dp, Color(0xFF05AC64), CircleShape)
+                                .padding(end = 3.dp)
+                        )
+                        Text(
+                            text = "Male - ${maleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .width(20.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE3E1F7))
+                                .border(1.dp, Color(0xFF283B5B), CircleShape)
+                                .padding(end = 3.dp)
+                        )
+                        Text(
+                            text = "Female - ${femaleCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+    if(isTutorial) {
+        Dialog(
+            onDismissRequest = {
+                isTutorial = false
+            },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(10.dp),
+                    painter = painterResource(id = R.drawable.student_det),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+    }
+}

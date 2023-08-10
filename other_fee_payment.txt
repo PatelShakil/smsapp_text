@@ -1,0 +1,207 @@
+
+@Composable
+fun TopCardOtherFee() {
+    val spacing = MaterialTheme.spacing
+    val educationalYear = "2023-24"
+    androidx.compose.material.Card(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.background(Color(0xFFFEFEFE))) {
+            val (cardNameText,cardImage,currentYearText) = createRefs()
+            Text(text = "Other fee payment",
+                modifier = Modifier
+                    .padding(start = spacing.medium, top = spacing.medium / 2)
+                    .constrainAs(cardNameText) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }
+                    .fillMaxWidth(0.5f)
+                    .background(Color(0xFFFDFEFE)),
+                style = MaterialTheme.typography.titleMedium,
+                color = MainColor,
+                fontSize = 19.sp,
+                softWrap = true)
+            Image(painterResource(id = R.drawable.other_fee_payment), contentDescription = "noticeboard",
+                modifier = Modifier
+                    .constrainAs(cardImage) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .height(120.dp)
+                    .width(150.dp),
+                contentScale = ContentScale.FillBounds)
+
+
+            Box(modifier = Modifier
+                .padding(start = spacing.medium)
+                .border(1.dp, Color.Gray, CircleShape)
+                .constrainAs(currentYearText) {
+                    top.linkTo(cardNameText.bottom)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+                .background(Color.White, CircleShape)) {
+                androidx.compose.material.Text(text = "$educationalYear", modifier = Modifier
+                    .padding(horizontal = spacing.medium / 2),
+                )
+            }
+        }
+    }
+}
+data class ItemData(
+    val itemId:String,
+    var item:String
+)
+data class FinalData(
+    val itemData :ItemData,
+    val amount : Int
+)
+@Composable
+fun MainScreenFees(onProceedClicked : (List<FinalData>) -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth(.95f)
+        .padding(top = 5.dp)
+        .border(.5.dp, Color.Gray, RoundedCornerShape(8.dp))) {
+        val isAddClick = remember {
+            mutableStateOf(1)
+        }
+        val itemsList = listOf<ItemData>(
+            ItemData("1", "Item1"),
+            ItemData("2", "Item2"),
+            ItemData("3", "Item3"),
+            ItemData("4", "Item4"),
+            ItemData("5", "Item5"),
+        )
+        val dropDownList = mutableListOf<FinalData>()
+     Column(modifier = Modifier
+         .fillMaxWidth()
+         .background(Color.White)
+         .verticalScroll(ScrollState(0), true),
+     horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Collect other Fee",
+        modifier = Modifier.padding(top = 5.dp))
+        Box(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth(.8f)
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "",
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(30.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterEnd)
+                    .background(Color.White)
+                    .clickable {
+                        isAddClick.value++
+                    })
+        }
+        var totalAmount = 0
+         Box(modifier = Modifier.fillMaxWidth(.94f), contentAlignment = Alignment.Center) {
+             Text(
+                 "Select Item", modifier = Modifier.align(Alignment.TopStart),
+                 style = MaterialTheme.typography.bodyMedium
+             )
+             Text(
+                 "Amount", modifier = Modifier.align(Alignment.TopEnd),
+                 style = MaterialTheme.typography.bodyMedium
+             )
+         }
+         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+             repeat(isAddClick.value) {
+                 Row(verticalAlignment = Alignment.CenterVertically,
+                 horizontalArrangement = Arrangement.Center) {
+                     val amount = remember {
+                         mutableStateOf(0)
+                     }
+                     val item = remember { mutableStateOf(ItemData("1", "Item1")) }
+                     Box(modifier = Modifier.fillMaxWidth(.95f), contentAlignment = Alignment.Center) {
+                         DropDownSample(label = "", placeHolder = "", list = itemsList, onSelect = {
+                             item.value = it
+                         }, onAmountFixed = {
+                             amount.value = it
+                         })
+                     }
+                     totalAmount += amount.value
+                     dropDownList.add(FinalData(item.value, amount.value))
+                 }
+             }
+         }
+         Spacer(modifier = Modifier.height(5.dp))
+         Box(modifier = Modifier.clickable { onProceedClicked(dropDownList)}
+             .background(MainColor, CircleShape)) {
+             Text("Pay Rs ${totalAmount}",color = Color.White,
+             style = MaterialTheme.typography.titleSmall,
+             modifier = Modifier.padding(horizontal = 5.dp)
+                 .align(Alignment.Center))
+         }
+         Spacer(modifier = Modifier.height(5.dp) )
+    }
+    }
+}
+@Composable
+fun getAmount(onAmountSet:(Int)-> Unit) {
+    val amount = remember{ mutableStateOf(0) }
+    TextField(value = amount.value.toString(), onValueChange = {
+        if(it.isNotEmpty()) {
+        amount.value = it.toInt()
+        }
+        onAmountSet(amount.value)},
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+
+    )
+}
+@Composable
+fun DropDownSample(label : String,placeHolder: String,list: List<ItemData>,onSelect: (ItemData)->Unit,onAmountFixed: (Int) -> Unit) {
+    val expanded = remember { mutableStateOf(false) }
+    val selectedText = remember { mutableStateOf(ItemData("1","Item1")) }
+    val icon = if (expanded.value)
+        Icons.Default.KeyboardArrowUp //it requires androidx.compose.material:material-icons-extended
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row {
+        Column(modifier = Modifier.weight(.7f)
+            .background(Color.White)) {
+            TextField(
+                value = selectedText.value.item,
+                readOnly = true,
+                onValueChange = {
+                    selectedText.value.item = it
+                    onSelect(selectedText.value)
+                },
+                modifier = Modifier
+                    .clickable {
+                        expanded.value = !expanded.value
+                    },
+                placeholder = { Text(placeHolder) },
+                label = { Text(label) },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
+                },
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+            )
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+            ) {
+                list.forEach { label ->
+                    DropdownMenuItem(onClick = {
+                        selectedText.value = label
+                        expanded.value = false
+                        onSelect(label)
+                    },
+                        text = { Text(label.item) }
+                    )
+                }
+            }
+        }
+        Box(modifier = Modifier
+            .padding( start = 4.dp)
+            .weight(.3f)) {
+            getAmount(onAmountSet = {
+                onAmountFixed(it)
+            })
+        }
+    }
+}

@@ -1,0 +1,468 @@
+@Composable
+fun BalanceReportScreen(list : ArrayList<FeeBAReportItem>) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.height(10.dp))
+            LazyColumn() {
+                list.forEach {
+                    item {
+                        BalanceReportItemNew(it)
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun FilterRowCard(onFilterSelected : (String,String) -> Unit) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(White), horizontalAlignment = Alignment.CenterHorizontally) {
+        val isFilterDialogOpen = remember {
+            mutableStateOf(false)
+        }
+        val classId = remember { mutableStateOf("") }
+        val sectionId = remember { mutableStateOf("") }
+        Spacer(modifier = Modifier.height(5.dp))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "${classId.value} - (${sectionId.value})", modifier = Modifier
+                    .weight(.7f)
+                    .padding(start = 5.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .weight(.3f)
+                    .clickable {
+                        isFilterDialogOpen.value = true
+                    },
+                verticalAlignment = CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_filter_blue_30),
+                    contentDescription = "",
+                    tint = MainColor
+                )
+                Text(
+                    "Filter",
+                    modifier = Modifier.padding(top = 3.dp)
+                )
+                Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
+            }
+        }
+        if (isFilterDialogOpen.value) {
+            FilterBAReportDialog(onDismiss = {
+                isFilterDialogOpen.value = false
+            }, onConfirm = { c, s ->
+                classId.value = c
+                sectionId.value = s
+                onFilterSelected(c, s)
+            })
+        }
+    }
+
+}
+@Composable
+fun FilterBAReportDialog(
+    onDismiss:()->Unit,
+    onConfirm:(classId: String,sectionId:String)->Unit
+) {
+    val selectedClass = remember { mutableStateOf("1001") }
+    val selectedSection = remember { mutableStateOf("1002")}
+    Dialog(onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(modifier = Modifier.fillMaxWidth(.95f)) {
+            Column(modifier = Modifier
+                .background(White)
+                .fillMaxWidth()) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filter_blue_30),
+                        contentDescription = "",
+                        tint = MainColor
+                    )
+                    Text(
+                        "Select Class & Section",
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth(.90f)
+                        .align(Alignment.CenterHorizontally)
+                        .background(Black)
+                        .height(2.dp)
+                )
+                Button(
+                    onClick = {
+                        onConfirm(selectedClass.value, selectedSection.value)
+                        onDismiss()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(.8f)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Apply")
+                }
+            }
+        }
+
+    }
+
+}
+@Composable
+fun BalanceReportItem(data: FeeBAReportItem) {
+    Card(modifier = Modifier.fillMaxWidth(.95f), border = BorderStroke(.5.dp, Gray),
+    elevation = CardDefaults.cardElevation(30.dp
+    )) {
+        val expanded = remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(White),
+            horizontalAlignment = Alignment.CenterHorizontally, ) {
+
+            Row(
+                Modifier
+                    .background(White)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = CenterVertically
+            ) {
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row() {
+                        Icon(
+                            imageVector = Icons.Default.Person, contentDescription = "",
+                            tint = MainColor
+                        )
+                        Text(
+                            "${data.studentinfo.searchdata} (${data.studentinfo.classname}-${data.studentinfo.sectionname})",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    Text(
+                        data.studentinfo.admissionno,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+
+            Card(modifier = Modifier.fillMaxWidth(.95f),border = BorderStroke(.5.dp, Gray)) {
+                Text(
+                    text = "Paid Info",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(White),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(White)) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("₹${data.feepaidamount}",
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text("Fee Paid",
+                            style = MaterialTheme.typography.titleSmall)
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("₹${data.otherpaidamount}",
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text("Other Paid",
+                            style = MaterialTheme.typography.titleSmall)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Card(modifier = Modifier.fillMaxWidth(.95f)) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(White)) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(.8f)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFFED7D9))
+                                ) {
+                                    Text("₹${data.balanceamount}",
+                                        style = MaterialTheme.typography.bodyMedium)
+                                    Text("Balance",
+                                        style = MaterialTheme.typography.titleSmall)
+                                }
+
+                            }
+                        }
+                        Column(modifier = Modifier.weight(.8f)) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFCFE3F6))
+                                ) {
+                                    Text("₹${data.dueamount}",
+                                        style = MaterialTheme.typography.bodyMedium)
+                                    Text("Due",
+                                        style = MaterialTheme.typography.titleSmall)
+                                }
+                            }
+                        }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+            Card(modifier = Modifier.fillMaxWidth(.95f), border = BorderStroke(.5.dp, Gray)) {
+                ExpandableContent(
+                    expanded = expanded.value,
+                    data.duemonthlist,
+                ) { expanded.value = !expanded.value }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+}
+@Composable
+fun BalanceReportItemNew(data : FeeBAReportItem) {
+    Card(modifier = Modifier.fillMaxWidth(.95f),
+    border = BorderStroke(.5.dp, MainColor),
+        elevation = CardDefaults.cardElevation(30.dp)
+    ) {
+        val expanded = remember { mutableStateOf(false) }
+        Column(modifier = Modifier
+            .background(White)
+            .fillMaxWidth()
+            .padding(start = 10.dp)
+
+            ) {
+            Text(
+            text = "Name : ${data.studentinfo.searchdata}",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "${data.studentinfo.admissionno}",
+            color = Color(0xFF277D7C),
+            style = MaterialTheme.typography.titleSmall
+            )
+            Row {
+                Icon(painter = painterResource(id = R.drawable.remove_circle),
+                    contentDescription = "",
+                tint = Color(0xFFD54B4B))
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    "Balance : ₹ ${data.balanceamount}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFFD54B4B)
+                )
+            }
+            Row {
+                Icon(imageVector = Icons.Default.Warning,
+                    contentDescription = "",
+                tint = Color(0xFFD54B4B) )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = "Due : ₹ ${data.dueamount}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFFD54B4B)
+                )
+            }
+            Row {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    "",
+                    tint = Color(0xFF277D7C)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+
+                Text(
+                    text = "Fee Paid : ₹ ${data.feepaidamount}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFF277D7C),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row {
+                Icon(
+                imageVector = Icons.Default.AddCircle,
+                "",
+                tint = Color(0xFF277D7C)
+            )
+                Spacer(modifier = Modifier.width(5.dp))
+
+                Text(
+                    text = "Other Paid : ₹ ${data.otherpaidamount}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFF277D7C),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        ExpandableContent(
+                expanded = expanded.value,
+        data.duemonthlist,
+        ) { expanded.value = !expanded.value }
+    }
+}
+@Composable
+fun ExpandableContent(expanded: Boolean, list: List<Duemonthlist>, onToggle: () -> Unit) {
+    Column(
+        Modifier
+            .background(White)
+            .padding(2.dp)
+            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Row (verticalAlignment = CenterVertically){
+            Icon(painter = painterResource(R.drawable.ic_calender_dashboard), contentDescription = "",
+            tint = MainColor)
+            Text(modifier = Modifier
+                .padding(top = 3.dp)
+                .fillMaxWidth(.8f),
+                textAlign = TextAlign.Start,
+                text = "Total Due Fee Month (${list.size})",
+                style = MaterialTheme.typography.bodyMedium)
+            IconButton(
+                    onClick = onToggle,
+            ) {
+            Icon(
+                if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Expand/Collapse"
+            )
+        }
+        }
+            AnimatedVisibility(visible = expanded) {
+                Card(border = BorderStroke(.5.dp, Color(0xFF00498A)),
+                    modifier = Modifier.fillMaxWidth(.95f)) {
+                    Column(modifier = Modifier
+                        .background(White)
+                        .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                    list.forEach {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Center
+                            ) {
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    "${it.monthname}",
+                                    modifier = Modifier.weight(1f),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Text(
+                                    "₹${it.dueeamount}",
+                                    modifier = Modifier.weight(.6f),
+                                    textAlign = TextAlign.End,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                            }
+                        }
+                    }
+            }
+
+            }
+        Spacer(modifier = Modifier.height(10.dp))
+        
+    }
+}
+@Composable
+fun BalanceReportTopCard(totalBalance: Double, totalDue: Double, totalAmount: Double) {
+    Card(modifier = Modifier.fillMaxWidth(.95f)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(White), horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.height(5.dp))
+                Card(modifier = Modifier
+                    .fillMaxWidth(),
+                border = BorderStroke(.5.dp, Color(0xFF004B8D))
+                ) {
+                    Column(horizontalAlignment = Alignment.End,modifier = Modifier
+                        .background(White)
+                        .padding(end = 5.dp)
+                        .fillMaxWidth()){
+                        Spacer(modifier = Modifier.height(5.dp))
+                    Text("Total Amount Collected",
+                    style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF004B8D))
+                    Text("₹ ${totalAmount}",modifier = Modifier.padding(horizontal = 4.dp),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF004B8D))
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Card(border = BorderStroke(.5.dp,Color(0xFF004B8D))) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier
+                    .fillMaxWidth()
+                    .background(White)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                "Total Balance",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF004B8D)
+                            )
+                            Text(
+                                "₹ ${totalBalance}", modifier = Modifier.padding(horizontal = 4.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF004B8D)
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                        }
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(Color(0xFF004B8D)),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                "Total Due",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = White
+                            )
+                            Text(
+                                "₹ $totalDue", modifier = Modifier.padding(horizontal = 4.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = White
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

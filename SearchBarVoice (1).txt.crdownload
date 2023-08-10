@@ -1,0 +1,150 @@
+//add this two dependencies in build.gradle(Module:app)
+implementation "io.coil-kt:coil-compose:2.2.2"
+    implementation "io.coil-kt:coil-gif:2.1.0"
+
+//add this import statements
+
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+
+
+// paste this code in search textfield's trailing icon 
+trailingIcon = {
+                            if (showClearIcon.value) {
+                                IconButton(onClick = { query.value = "" }) {
+                                    androidx.compose.material3.Icon(
+                                        imageVector = Icons.Rounded.Clear,
+                                        tint = androidx.compose.material.MaterialTheme.colors.onBackground,
+                                        contentDescription = "Clear Icon"
+                                    )
+                                }
+                            }else{
+                                val isSearchClick = remember{ mutableStateOf(false) }
+                                IconButton(onClick ={
+                                    isSearchClick.value = !isSearchClick.value
+                                }
+                                ) {
+                                    androidx.compose.material3.Icon(
+                                        painter = painterResource(id = R.drawable.ic_mic),
+                                        tint = androidx.compose.material.MaterialTheme.colors.onBackground,
+                                        contentDescription = "Search Icon"
+                                    )
+                                }
+                                if (isSearchClick.value){
+                                    SpeechToText(onTextReceived = {
+                                        query.value = it
+                                    })
+                                }
+                            }
+                        },
+
+
+
+//this method should be in same layout file
+
+@Composable
+fun ProgressDialogNew(isShowing: Boolean,label : String) {
+    val isS = remember{ mutableStateOf(isShowing) }
+    if (isS.value) {
+        Dialog(
+            onDismissRequest = {
+            },
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Card(modifier = Modifier.fillMaxWidth(.95f)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(White),
+                verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .width(100.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                    ) {val context = LocalContext.current
+                        val imageLoader = ImageLoader.Builder(context)
+                            .components {
+                                if (SDK_INT >= 28) {
+                                    add(ImageDecoderDecoder.Factory())
+                                } else {
+                                    add(GifDecoder.Factory())
+                                }
+                            }
+                            .build()
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(context).data(data = R.drawable.voice).apply(block = {
+                                    size(Size.ORIGINAL)
+                                }).build(), imageLoader = imageLoader
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(100.dp)
+                                .graphicsLayer(
+                                    scaleX = 1f,
+                                    scaleY = 1.5f,
+                                ),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Text(modifier = Modifier.padding(start = 10
+                        .dp),text = label,
+                    fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+@Composable
+fun SpeechToText(onTextReceived: (String) -> Unit) {
+    val context = LocalContext.current
+    val label = "Listening..."
+    val isPdShown = remember{mutableStateOf(false)}
+    val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
+    val recognizerIntent = remember {
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now")
+        }
+    }
+
+    LaunchedEffect(speechRecognizer) {
+        speechRecognizer.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(params: Bundle?) {
+                isPdShown.value = !isPdShown.value
+            }
+            override fun onBeginningOfSpeech() {            }
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {
+                isPdShown.value = false
+            }
+            override fun onError(error: Int) {
+                isPdShown.value = false
+            }
+            override fun onResults(results: Bundle?) {
+                val data = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                data?.get(0)?.let { onTextReceived(it)
+                    isPdShown.value = !isPdShown.value
+                }
+            }
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+        speechRecognizer.startListening(recognizerIntent)
+    }
+    if (isPdShown.value){
+        ProgressDialogNew(isShowing = isPdShown.value, label = label)
+    }
+    DisposableEffect(speechRecognizer) {
+        onDispose {
+            speechRecognizer.stopListening()
+            speechRecognizer.destroy()
+        }
+    }
+}

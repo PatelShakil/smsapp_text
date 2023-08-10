@@ -1,0 +1,127 @@
+//replace this with condition in LedgerHeadMainScreen
+
+if(isLedgerEditClicked){
+            AddLedgerHeadPopupScreen(true,selectedHead,onDismiss = {
+                                                              isLedgerEditClicked = false
+            }, onConfirm = {
+                onUpdateLedgerHead(it)
+            })
+        }
+
+
+// replace this function with existing fun 
+
+@Composable
+fun AddLedgerHeadPopupScreen(
+    isEdit : Boolean = false,
+    head: LedgerHeadItem? = LedgerHeadItem(),
+    onDismiss: () -> Unit,
+    onConfirm: (LedgerHeadItem) -> Unit
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        var isBtnEnabled by remember{ mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 20.dp)
+                .background(Color.Transparent)
+                .clickable {
+                           onDismiss()
+                },
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(modifier = Modifier.fillMaxWidth(.95f).clickable {  }) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(25.dp)
+                            .background(Color.White),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Divider(
+                            modifier = Modifier
+                                .height(6.dp)
+                                .width(50.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = MainColor
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        "${if(isEdit) "Update" else "Add"} Ledger Head",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 30.dp)
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth(.95f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = head?.ledgername ?: "",
+                            icon = R.drawable.ic_person,
+                            label = "Name",
+                            onTextChanged = {
+                                head?.ledgername = it
+                                isBtnEnabled = head?.ledgername != "" && head?.ledgercode != "" && head?.ledgerdescription != ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                            AddLedgerTextField(
+                                value = head?.ledgercode ?: "",
+                                icon = R.drawable.ic_calender_dashboard,
+                                label = "Code",
+                                onTextChanged = {
+                                    head?.ledgercode = it
+                                    isBtnEnabled = head?.ledgername != "" && head?.ledgercode != "" && head?.ledgerdescription != ""
+
+                                }
+                            )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = head?.ledgerdescription ?: "",
+                            icon = R.drawable.ic_assignment_dashboard,
+                            label = "Description",
+                            onTextChanged = {
+                                head?.ledgerdescription = it
+                                isBtnEnabled = head?.ledgername != "" && head?.ledgercode != "" && head?.ledgerdescription != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Button(modifier = Modifier
+                            .fillMaxWidth(.9f),
+                            enabled = isBtnEnabled,
+                            onClick = {
+                                onConfirm(head!!)
+                                onDismiss()
+                            }) {
+                            Text(if(isEdit) "Update" else "Add")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}

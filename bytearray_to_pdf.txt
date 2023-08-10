@@ -1,0 +1,92 @@
+//Manifest 
+<provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.mycampus.smsapp.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
+//create new file in res -> xml -> filepaths.xml
+//paste below code in filepaths.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <root-path name="root" path="." />
+    <external-files-path name="myCampus" path="." />
+    <files-path
+        name="pdf"
+        path="."/>
+
+</paths>
+
+//in layoutfile
+
+@Composable
+fun CreatePdfFile(byteArray: ByteArray) {
+    val permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    val grantResults = permissions.map {
+        ContextCompat.checkSelfPermission(LocalContext.current, it)
+    }.toIntArray()
+
+    if (grantResults.contains(PackageManager.PERMISSION_DENIED)) {
+        ActivityCompat.requestPermissions(LocalContext.current as Activity, permissions, 1)
+
+    }
+
+    if(grantResults.contains(PackageManager.PERMISSION_GRANTED)){
+        // Create a new File object.
+        val pdfDirectory = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "/myCampus/"
+        )
+        if (!pdfDirectory.exists()){
+            pdfDirectory.mkdirs()
+        }
+        val file = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "myCampus/abcd.pdf"
+        )
+        if (!file.exists()){
+            file.createNewFile()
+        }
+
+        // Create a new FileOutputStream object for the file.
+        val fileOutputStream = FileOutputStream(file)
+
+        // Write the byte array to the file.
+        fileOutputStream.write(byteArray)
+
+        // Close the fileOutputStream object.
+        fileOutputStream.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = LocalContext.current.contentResolver
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/myCampus/")
+            }
+            resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+        }
+        // Open the PDF file in the user device.
+
+        val context = LocalContext.current
+        LaunchedEffect(key1 = ""){
+            val intent = Intent(
+                Intent.ACTION_VIEW, FileProvider.getUriForFile(
+                    context,
+                    context.packageName + ".fileprovider",
+                    file
+                )
+            )
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            context.startActivity(intent)
+        }
+    }
+}

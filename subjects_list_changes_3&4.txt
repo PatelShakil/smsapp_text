@@ -1,0 +1,443 @@
+//make sure to initialize all fields of data class SubjectInfoItem, Subjecttype and also Subjectcat
+//viewModel functions
+
+fun createSubject(subject: List<SubjectInfoItem>) = viewModelScope.launch {
+        subjectRepo.createSubject(subject).let {
+            when (it) {
+                is Resource.Success -> {
+                    getSubjectList(null)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    fun updateSubject(subject: SubjectInfoItem) = viewModelScope.launch {
+        subjectRepo.updateSubject(subject).let {
+            when (it) {
+                is Resource.Success -> {
+                    getSubjectList(null)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+
+//replace all below function with existing functions
+
+
+@Composable
+fun SubjectListScreen(viewModel: EmpSubjectViewModel, navController: NavController) {
+    var isAddSubject by remember { mutableStateOf(false) }
+    var isEditClicked by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            SubjectTopCard()
+            LaunchedEffect("launch") {
+                viewModel.init()
+            }
+            val subjectList = viewModel.subjectList.collectAsState()
+            subjectList.value.let {
+                when (it) {
+                    is Resource.Failure -> {
+                        if (it.errorMsgBody.contains("204"))
+                            onAPIFailed("No data for Subjects ", false)
+                        else
+                            onAPIFailed("Error Info (${it.errorCodeDescription}-${it.errorCode})")
+                    }
+
+                    Resource.Loading -> {
+                        FullScreenProgressbar()
+                    }
+
+                    is Resource.Success -> {
+                        if (it.result.isEmpty()) {
+                            //Need to Handle Empty Screen
+                        } else {
+                            SubjectMainScreen(it.result,
+                                onUpdateSubject = { subject ->
+                                    viewModel.updateSubject(subject)
+                                })
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+        FloatingActionButton(
+            onClick = {
+                isAddSubject = !isAddSubject
+            },
+            modifier = Modifier
+                .padding(30.dp)
+                .align(Alignment.BottomEnd)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add, "",
+                tint = MainColor
+            )
+        }
+    }
+    if (isAddSubject) {
+        AddSubjectPopupScreen(onDismiss = {
+            isAddSubject = !isAddSubject
+        }, onConfirm = {
+            Log.d("Subject", it.toString())
+            viewModel.createSubject(listOf(it))
+        })
+    }
+}
+
+@Composable
+fun SubjectMainScreen(
+    result: ArrayList<SubjectInfoItem>,
+    onUpdateSubject: (SubjectInfoItem) -> Unit
+) {
+    var isEditClicked by remember {
+        mutableStateOf(false)
+    }
+    var selectedSubject by remember { mutableStateOf(SubjectInfoItem()) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(5.dp))
+        val totalCount = result.size
+        SubjectTotalInfoCard(totalCount)
+        Spacer(modifier = Modifier.height(10.dp))
+        result.forEach {
+            SubjectCardItem(data = it) {
+                isEditClicked = true
+                selectedSubject = it
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+        Spacer(Modifier.height(50.dp))
+
+    }
+    if (isEditClicked) {
+        AddSubjectPopupScreen(true, selectedSubject, onDismiss = {
+            isEditClicked = !isEditClicked
+        }, onConfirm = { subject ->
+            onUpdateSubject(subject)
+        })
+
+    }
+}
+
+@Composable
+fun SubjectCardItem(data: SubjectInfoItem, onEditSubject: (SubjectInfoItem) -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(.95f)
+    ) {
+        val bgColor = if (data.status == 0) Color(0xFFD4D5D4) else Color(0xFF263B5A)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFDAE1E9)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(
+                    modifier = Modifier
+                        .width(10.dp)
+                        .height(130.dp)
+                        .background(bgColor)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Column() {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(.7f)) {
+                            Text(
+                                "Name : " + data.subjectname,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                "Code : " + data.subjectcode,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                text = "Type : " + data.subjecttype.name + " (${data.subjectcat.name})",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                "Description : ",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                data.subjectdescription,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp
+                            )
+                        }
+                        Spacer(Modifier.width(5.dp))
+                        Column() {
+                            Box(
+                                modifier = Modifier
+                                    .size(25.dp)
+                                    .clip(CircleShape)
+                                    .border(.5.dp, Color(0xFF263B5A), CircleShape)
+                                    .align(Alignment.End)
+                                    .clickable {
+                                        onEditSubject(data)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit, "",
+                                    tint = Color(0xFF263B5A),
+                                    modifier = Modifier
+                                        .size(17.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Box(
+                                modifier = Modifier
+                                    .height(70.dp)
+                                    .width(70.dp)
+                                    .clip(CircleShape)
+                                    .background(bgColor)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_book),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .height(50.dp)
+                                        .width(50.dp),
+                                    tint = if (data.status == 1) Color.White else Color(0xFF263B5A)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+
+//Additional functions required for operations
+
+@Composable
+fun SubjectTotalInfoCard(totalCount: Int) {
+    Card(modifier = Modifier.fillMaxWidth(.95f)) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleSmall,
+            text = "Total Subjects ($totalCount)",
+            fontWeight = FontWeight.Black
+        )
+    }
+
+}
+
+
+@Composable
+fun AddSubjectPopupScreen(
+    isEdit: Boolean = false,
+    subject: SubjectInfoItem? = SubjectInfoItem(id = 0, status = 1),
+    onDismiss: () -> Unit,
+    onConfirm: (SubjectInfoItem) -> Unit
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        var isBtnEnabled by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 20.dp)
+                .background(Color.Transparent)
+                .clickable {
+                    onDismiss()
+                },
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(modifier = Modifier
+                .fillMaxWidth(.95f)
+                .clickable { }) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(25.dp)
+                            .background(Color.White),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Divider(
+                            modifier = Modifier
+                                .height(6.dp)
+                                .width(50.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = MainColor
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    androidx.compose.material3.Text(
+                        "${if (isEdit) "Update" else "Add"} Subject",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 30.dp)
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth(.95f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = subject?.subjectname ?: "",
+                            icon = R.drawable.ic_book,
+                            label = "Name",
+                            onTextChanged = {
+                                subject?.subjectname = it
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = subject?.subjectcode ?: "",
+                            icon = R.drawable.ic_assignment_dashboard,
+                            label = "Code",
+                            onTextChanged = {
+                                subject?.subjectcode = it
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        DropDownCategory(
+                            label = "Category",
+                            selectedItem = DropDownItemData(
+                                subject?.subjectcat?.code!!,
+                                subject?.subjectcat?.name!!
+                            ),
+                            list = listOf(
+                                DropDownItemData("COMP", "Compulsory")
+                            ),
+                            onSelect = {
+                                subject?.subjectcat?.name = it.text
+                                subject?.subjectcat?.code = it.id
+                                subject?.subjectcat?.filter = null
+                                subject?.subjectcat?.webappid = "gXOYvO"
+
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        DropDownCategory(
+                            label = "Type",
+                            selectedItem = DropDownItemData(
+                                subject?.subjecttype?.code!!,
+                                subject?.subjecttype?.name!!
+                            ),
+                            list = listOf(
+                                DropDownItemData("THEORY", "Theory"),
+                            ),
+                            onSelect = {
+                                subject?.subjecttype?.name = it.text
+                                subject?.subjecttype?.code = it.id
+                                subject?.subjecttype?.filter = null
+                                subject?.subjecttype?.webappid = "gXOYvO"
+
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        AddLedgerTextField(
+                            value = subject?.subjectdescription ?: "",
+                            icon = R.drawable.ic_assignment_dashboard,
+                            label = "Description",
+                            onTextChanged = {
+                                subject?.subjectdescription = it
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        DropDownCategory(
+                            label = "Status",
+                            selectedItem = DropDownItemData(
+                                subject?.status.toString(),
+                                if (subject.status == 1) "Enable" else "Disable"
+                            ),
+                            list = listOf(
+                                DropDownItemData("1", "Enable"),
+                                DropDownItemData("0", "Disable")
+                            ),
+                            onSelect = {
+                                if (it.id == "1")
+                                    subject?.status = 1
+                                else
+                                    subject?.status = 0
+                                isBtnEnabled =
+                                    subject?.subjectname != "" && subject?.subjectcode != "" && subject?.subjecttype != Subjecttype() && subject?.subjectcat != Subjectcat() && subject?.subjectdescription != ""
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        Button(modifier = Modifier
+                            .fillMaxWidth(.9f),
+                            enabled = isBtnEnabled,
+                            onClick = {
+                                subject.id = 0
+                                onConfirm(subject)
+                                onDismiss()
+                            }) {
+                            androidx.compose.material3.Text(if (isEdit) "Update" else "Add")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}

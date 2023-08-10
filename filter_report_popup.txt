@@ -1,0 +1,451 @@
+//imports statements
+
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.net.Uri
+import android.os.Environment
+import android.os.ParcelFileDescriptor
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
+import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.view.drawToBitmap
+import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import coil.imageLoader
+import coil.memory.MemoryCache
+import coil.request.ImageRequest
+import com.mycampus.smsapp.R
+import com.mycampus.smsapp.data.Resource
+import com.mycampus.smsapp.data.models.reportfilter.Dependentfield
+import com.mycampus.smsapp.data.models.reportfilter.ReportFilterItem
+import com.mycampus.smsapp.data.models.reportfilter.Subfilter
+import com.mycampus.smsapp.ui.common.FullScreenProgressbar
+import com.mycampus.smsapp.ui.common.onAPIFailed
+import com.mycampus.smsapp.ui.theme.AppTheme
+import com.mycampus.smsapp.ui.theme.LightMainColor
+import com.mycampus.smsapp.ui.theme.MainColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+
+//filter popup calling function
+        FilterReportPopupCalling(viewModel)
+
+//data getting and receiving from viewModel
+
+@Composable
+fun FilterReportPopupCalling(viewModel: HomeViewModel) {
+    val reportList = viewModel.reportList.collectAsState()
+    reportList.value?.let {
+        when (it) {
+            is Resource.Failure -> {
+                if (it.errorMsgBody.contains("204"))
+                    onAPIFailed("No data for report ", false)
+                else
+                    onAPIFailed("Report Info (${it.errorCodeDescription}-${it.errorCode})")
+
+            }
+
+            Resource.Loading -> {
+                FullScreenProgressbar()
+            }
+
+            is Resource.Success -> {
+                if (it.result.isEmpty()) {
+                    //Need to Handle Empty Screen
+                } else {
+                    FilterReportPopup(it.result, {},{
+                        Log.d("Filtered Item", it.toString())
+                    })
+                }
+            }
+        }
+    }
+}
+
+
+//all required function
+
+@Composable
+fun FilterReportPopup(
+    data: ArrayList<ReportFilterItem>,
+    onDismiss: () -> Unit,
+    onConfirm: (ReportFilterItem) -> Unit
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        var selectedFilter by remember { mutableStateOf(ReportFilterItem()) }
+        var selectedSubFilter by remember { mutableStateOf(Subfilter()) }
+        val depList = ArrayList<Dependentfield>()
+        var isPDF by remember { mutableStateOf(false) }
+        var isWord by remember { mutableStateOf(false) }
+        var isExcel by remember { mutableStateOf(false) }
+        var isClick by remember { mutableStateOf(false) }
+
+        Card(modifier = Modifier.fillMaxWidth(.95f)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filter_blue_30),
+                        "",
+                        tint = MainColor
+                    )
+                    Text("Report Filter")
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth(.95f)
+                        .height(1.dp), color = Color.Gray
+                )
+                Spacer(Modifier.height(5.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth(.95f)
+                ) {
+
+
+                    DropDownReportFilter(
+                        label = "Filter",
+                        selectedItem = data[0],
+                        list = data,
+                        onSelect = {
+                            selectedFilter = it
+                            selectedSubFilter = Subfilter()
+
+                        })
+                    if (!selectedFilter.subfilter.isNullOrEmpty()) {
+                        DropDownReportSubFilter(
+                            label = "Subfilter",
+                            list = selectedFilter.subfilter,
+                            onSelect = {
+                                selectedSubFilter = it
+                            }
+                        )
+                        if (!selectedSubFilter.dependentfield.isNullOrEmpty()) {
+                            selectedSubFilter.dependentfield!!.forEach {
+                                if (it.widgettype == "date") {
+                                    DatePickerDialogCustom(
+                                        date = it.defaultvalue,
+                                        onDateSelect = { date ->
+                                            depList.add(
+                                                Dependentfield(
+                                                    date,
+                                                    it.isapibased,
+                                                    it.key,
+                                                    it.widgetlabel,
+                                                    it.widgettype
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = isPDF, onClick = {
+                            isPDF = !isPDF
+                            isWord = false
+                            isExcel = false
+                        })
+                        Text(
+                            "PDF",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 3.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = isWord, onClick = {
+                            isPDF = false
+                            isWord = !isWord
+                            isExcel = false
+                        })
+                        Text(
+                            "Word",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 3.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = isExcel, onClick = {
+                            isPDF = false
+                            isWord = false
+                            isExcel = !isExcel
+                        })
+                        Text(
+                            "Excel",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 3.dp)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(5.dp))
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(.9f),
+                    onClick = {
+                        val obj = data.find { selectedFilter == it }
+                        if (selectedSubFilter == null) {
+                            selectedSubFilter = obj?.subfilter?.get(0)!!
+                        } else {
+                            val subfil = obj?.subfilter?.find { selectedSubFilter == it }
+                            subfil?.dependentfield = depList
+                        }
+                        obj?.subfilter = listOf(selectedSubFilter)
+                        if (obj != null) {
+                            onConfirm(obj)
+                        }
+                        isClick = true
+                        onDismiss()
+                    },
+                ) {
+                    Text("Apply Filter")
+                }
+                if (isClick) {
+                    isClick = false
+                    if (isPDF) {
+                    }
+                    else if (isExcel) {
+                    }
+                    else if (isWord) {
+                    }
+                }
+            }
+            }
+        }
+    }
+
+
+
+@Composable
+fun DropDownReportFilter(
+    label: String,
+    selectedItem: ReportFilterItem,
+    list: List<ReportFilterItem>,
+    onSelect: (ReportFilterItem) -> Unit
+) {
+    val expanded = remember { mutableStateOf(false) }
+    val selected = remember { mutableStateOf(selectedItem) }
+    val icon = if (expanded.value)
+        Icons.Default.KeyboardArrowUp //it requires androidx.compose.material:material-icons-extended
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(.7f)
+                .background(Color.White)
+        ) {
+            androidx.compose.material.TextField(
+                value = selected.value.filtername,
+                readOnly = true,
+                onValueChange = {},
+                modifier = Modifier
+                    .clickable {
+                        expanded.value = !expanded.value
+                    }
+                    .fillMaxWidth(),
+//                placeholder = { Text(placeHolder) },
+                label = { androidx.compose.material.Text(label) },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
+                },
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+            )
+            androidx.compose.material.DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+            ) {
+                list.forEach { label ->
+                    androidx.compose.material.DropdownMenuItem(onClick = {
+                        selected.value = label
+                        expanded.value = false
+                        onSelect(label)
+                    },
+                        content = { androidx.compose.material.Text(label.filtername) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DropDownReportSubFilter(
+    label: String,
+    list: List<Subfilter>,
+    onSelect: (Subfilter) -> Unit
+) {
+    val expanded = remember { mutableStateOf(false) }
+    val selected = remember { mutableStateOf(Subfilter()) }
+    val icon = if (expanded.value)
+        Icons.Default.KeyboardArrowUp //it requires androidx.compose.material:material-icons-extended
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(.7f)
+                .background(Color.White)
+        ) {
+            androidx.compose.material.TextField(
+                value = selected.value.subfiltername,
+                readOnly = true,
+                onValueChange = {},
+                modifier = Modifier
+                    .clickable {
+                        expanded.value = !expanded.value
+                    }
+                    .fillMaxWidth(),
+//                placeholder = { Text(placeHolder) },
+                label = { androidx.compose.material.Text(label) },
+                trailingIcon = {
+                    Icon(icon, "contentDescription",
+                        Modifier.clickable { expanded.value = !expanded.value })
+                },
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+            )
+            androidx.compose.material.DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+            ) {
+                list.forEach { label ->
+                    androidx.compose.material.DropdownMenuItem(onClick = {
+                        selected.value = label
+                        expanded.value = false
+                        onSelect(label)
+                    },
+                        content = { androidx.compose.material.Text(label.subfiltername) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DatePickerDialogCustom(date: String, onDateSelect: (String) -> Unit) {
+    var date by remember {
+        mutableStateOf(date)
+    }
+    var isDatePickerShow by remember { mutableStateOf(false) }
+    androidx.compose.material.OutlinedTextField(value = date, onValueChange = {},
+        leadingIcon = {
+            Icon(
+                painterResource(id = R.drawable.ic_calender_dashboard), contentDescription = "",
+                tint = MainColor
+            )
+        },
+        label = { androidx.compose.material.Text("Date", color = MainColor) },
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MainColor
+        ),
+        trailingIcon = {
+            Box(
+                modifier = Modifier
+                    .size(25.dp)
+                    .clip(CircleShape)
+                    .border(.5.dp, MainColor, CircleShape)
+                    .clickable {
+                        isDatePickerShow = !isDatePickerShow
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit, "",
+                    tint = MainColor,
+                    modifier = Modifier
+                        .size(17.dp)
+                )
+            }
+        }
+    )
+    if (isDatePickerShow) {
+        val datePicker = android.app.DatePickerDialog(LocalContext.current)
+        datePicker.setOnDateSetListener { datePicker, d, m, y ->
+            date = "$y-${m + 1}-$d"
+            isDatePickerShow = !isDatePickerShow
+            onDateSelect(date)
+        }
+        datePicker.show()
+    }
+}
+

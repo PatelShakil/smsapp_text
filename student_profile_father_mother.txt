@@ -1,0 +1,476 @@
+//father info
+
+
+@Composable
+fun StudentFatherInfoScreen(viewModel: StudentProfileEditViewModel) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(.95f)
+            .background(Color.White)
+            .border(
+                .5.dp, Gray,
+                RoundedCornerShape(15.dp)
+            )
+    ) {
+        val isEditable = remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(White)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(25.dp)
+                    .background(LightMainColor),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Father Info",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleSmall
+                )
+            }
+            if (isEditable.value) {
+                SampleTextField(
+                    label = "Father Name",
+                    text = viewModel.family.fatherName,
+                    onTextChanged = {
+                        viewModel.family.fatherName = it
+                    })
+                SampleTextField(
+                    label = "Mobile no.",
+                    text = viewModel.family.fatherMobile,
+                    onTextChanged = {
+                        viewModel.family.fatherMobile = it
+                    })
+                SampleTextFieldDouble(
+                    label = "Age",
+                    text = viewModel.family.fatherAge.toDouble(),
+                    onAmountSet = {
+                        viewModel.family.fatherAge = it.toInt()
+                    })
+                DropDownString(
+                    label = "Occupation",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.fatherOccupationId,
+                        viewModel.family.fatherOccupation
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "Teacher"),
+                        DropDownItemData("2", "Business Man"),
+                        DropDownItemData("3", "Doctor"),
+                        DropDownItemData("4", "Pilot"),
+                        DropDownItemData("5", "Professor"),
+                        DropDownItemData("6", "Private Job"),
+                        DropDownItemData("7", "Engineer"),
+                        DropDownItemData("8", "Government Employee"),
+                        DropDownItemData("9", "Others"),
+                    ),
+                    onSelect = {
+                        viewModel.family.fatherOccupation = it.text
+                        viewModel.family.fatherOccupationId = it.id
+                    }
+                )
+                DropDownString(
+                    label = "Annual Income",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.fatherAnnualIncomeId,
+                        viewModel.family.fatherAnnualIncome
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "< 2 Lac"),
+                        DropDownItemData("2", "2 Lac - 4 Lac"),
+                        DropDownItemData("3", "4 Lac - 6 Lac"),
+                        DropDownItemData("4", "6 Lac - 8 Lac"),
+                        DropDownItemData("5", "8 Lac - 10 Lac"),
+                        DropDownItemData("6", "10 Lac - 12 Lac"),
+                        DropDownItemData("7", "12 Lac - 14 Lac"),
+                        DropDownItemData("8", "14 Lac - 16 Lac"),
+                        DropDownItemData("9", "16 Lac - 18 Lac"),
+                        DropDownItemData("10", "18 Lac - 20 Lac"),
+                        DropDownItemData("11", "> 20 Lac"),
+                    ),
+                    onSelect = {
+                        viewModel.family.fatherAnnualIncome = it.text
+                        viewModel.family.fatherAnnualIncomeId = it.id
+                    }
+                )
+                DropDownString(
+                    label = "Qualification",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.fatherQualificationId,
+                        viewModel.family.fatherQualification
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "Matriculation"),
+                        DropDownItemData("2", "Intermediate"),
+                        DropDownItemData("3", "Graduation"),
+                        DropDownItemData("4", "Post Graduation"),
+                        DropDownItemData("5", "Phd"),
+                        DropDownItemData("6", "Others"),
+                    ),
+                    onSelect = {
+                        viewModel.family.fatherQualification = it.text
+                        viewModel.family.fatherQualificationId = it.id
+                    }
+                )
+            } else {
+                LabelField(label = "Father Name", value = viewModel.family.fatherName)
+                LabelField(label = "Mobile no.", value = viewModel.family.fatherMobile)
+                LabelField(label = "Age", value = viewModel.family.fatherAge.toString())
+                LabelField(label = "Occupation", value = viewModel.family.fatherOccupation)
+                LabelField(label = "Annual Income", value = viewModel.family.fatherAnnualIncome)
+                LabelField(label = "Qualification", value = viewModel.family.fatherQualification)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LightMainColor)
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (isEditable.value) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = false
+                        }) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Close, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Cancel",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = false
+                        }) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Check, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Update",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Settings, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Manage",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(start = 3.dp, top = 4.dp)
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .clickable {
+                            isEditable.value = true
+                        }) {
+
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Edit, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Edit",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+//mother info
+
+@Composable
+fun StudentMotherInfoScreen(viewModel: StudentProfileEditViewModel) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(.95f)
+            .background(Color.White)
+            .border(
+                .5.dp, Gray,
+                RoundedCornerShape(15.dp)
+            )
+    ) {
+        val isEditable = remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(White)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(25.dp)
+                    .background(LightMainColor),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Mother Info",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleSmall
+                )
+            }
+            if (isEditable.value) {
+                SampleTextField(
+                    label = "Mother Name",
+                    text = viewModel.family.motherName,
+                    onTextChanged = {
+                        viewModel.family.motherName = it
+                    })
+                SampleTextField(
+                    label = "Mobile no.",
+                    text = viewModel.family.motherMobile,
+                    onTextChanged = {
+                        viewModel.family.motherMobile = it
+                    }
+                )
+                SampleTextFieldDouble(
+                    label = "Age",
+                    text = viewModel.family.motherAge.toDouble(),
+                    onAmountSet = {
+                        viewModel.family.motherAge = it.toInt()
+                    }
+                )
+                DropDownString(
+                    label = "Occupation",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.motherOccupationId,
+                        viewModel.family.motherOccupation
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "Teacher"),
+                        DropDownItemData("2", "Business Man"),
+                        DropDownItemData("3", "Doctor"),
+                        DropDownItemData("4", "Pilot"),
+                        DropDownItemData("5", "Professor"),
+                        DropDownItemData("6", "Private Job"),
+                        DropDownItemData("7", "Engineer"),
+                        DropDownItemData("8", "Government Employee"),
+                        DropDownItemData("9", "Others"),
+                    ),
+                    onSelect = {
+                        viewModel.family.motherOccupation = it.text
+                        viewModel.family.motherOccupationId = it.id
+                    }
+                )
+                DropDownString(
+                    label = "Annual Income",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.motherAnnualIncomeId,
+                        viewModel.family.motherAnnualIncome
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "< 2 Lac"),
+                        DropDownItemData("2", "2 Lac - 4 Lac"),
+                        DropDownItemData("3", "4 Lac - 6 Lac"),
+                        DropDownItemData("4", "6 Lac - 8 Lac"),
+                        DropDownItemData("5", "8 Lac - 10 Lac"),
+                        DropDownItemData("6", "10 Lac - 12 Lac"),
+                        DropDownItemData("7", "12 Lac - 14 Lac"),
+                        DropDownItemData("8", "14 Lac - 16 Lac"),
+                        DropDownItemData("9", "16 Lac - 18 Lac"),
+                        DropDownItemData("10", "18 Lac - 20 Lac"),
+                        DropDownItemData("11", "> 20 Lac"),
+                    ),
+                    onSelect = {
+                        viewModel.family.motherAnnualIncome = it.text
+                        viewModel.family.motherAnnualIncomeId = it.id
+                    }
+                )
+                DropDownString(
+                    label = "Qualification",
+                    selectedItem = DropDownItemData(
+                        viewModel.family.motherQualificationId,
+                        viewModel.family.motherQualification
+                    ),
+                    list = listOf(
+                        DropDownItemData("1", "Matriculation"),
+                        DropDownItemData("2", "Intermediate"),
+                        DropDownItemData("3", "Graduation"),
+                        DropDownItemData("4", "Post Graduation"),
+                        DropDownItemData("5", "Phd"),
+                        DropDownItemData("6", "Others"),
+                    ),
+                    onSelect = {
+                        viewModel.family.motherQualification = it.text
+                        viewModel.family.motherQualificationId = it.id
+                    }
+                )
+            } else {
+                LabelField(label = "Mother Name", value = viewModel.family.motherName)
+                LabelField(label = "Mobile no.", value = viewModel.family.motherMobile)
+                LabelField(label = "Age", value = viewModel.family.motherAge.toString())
+                LabelField(label = "Occupation", value = viewModel.family.motherOccupation)
+                LabelField(label = "Annual Income", value = viewModel.family.motherAnnualIncome)
+                LabelField(label = "Qualification", value = viewModel.family.motherQualification)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LightMainColor)
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (isEditable.value) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            isEditable.value = false
+                        }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Close, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Cancel",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            isEditable.value = false
+                        }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Check, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Update",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Settings, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Manage",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(start = 3.dp, top = 4.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            isEditable.value = true
+                        }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    White
+                                )
+                        ) {
+                            Icon(
+                                Icons.Default.Edit, "",
+                                tint = MainColor
+                            )
+                        }
+                        Text(
+                            "Edit",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp, start = 3.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
